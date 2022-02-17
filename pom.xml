@@ -8,11 +8,11 @@
 		<version>2.6.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.levazeuxpierrick</groupId>
-	<artifactId>safetyNetAlertsApi</artifactId>
+	<groupId>com.safetynet.alerts</groupId>
+	<artifactId>api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>safetyNetAlertsApi</name>
-	<description>API for Safety net Alerts Application : project 5 of JAVA developer course (openclassrooms)</description>
+	<name>Api</name>
+	<description>API for SafetyNet Alerts Application : project 5 of JAVA developer course (openclassrooms)</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
