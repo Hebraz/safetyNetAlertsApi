@@ -2,6 +2,7 @@ package com.safetynet.alerts.api.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,6 +16,16 @@ public class MedicalRecord {
     private Date birthdate;
     private List<String> medications;
     private List<String> allergies;
+
+    public MedicalRecord(){}
+
+    public MedicalRecord(MedicalRecord medicalRecord){
+        this.firstName = medicalRecord.firstName;
+        this.lastName = medicalRecord.lastName;
+        this.birthdate = new Date(medicalRecord.birthdate.getTime());
+        this.medications = new ArrayList<>(medicalRecord.medications);
+        this.allergies = new ArrayList<>(medicalRecord.allergies);
+    }
 
     public String getFirstName() {
         return firstName;

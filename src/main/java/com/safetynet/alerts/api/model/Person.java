@@ -16,6 +16,18 @@ public class Person {
     private String phone;
     private String email;
 
+    public  Person() {}
+
+    public  Person(Person person) {
+        this.firstName = person.firstName;
+        this.lastName = person.lastName;
+        this.address = person.address;
+        this.city = person.city;
+        this.zip = person.zip;
+        this.phone = person.phone;
+        this.email = person.email;
+    }
+
     public String getFirstName() {
         return firstName;
     }
