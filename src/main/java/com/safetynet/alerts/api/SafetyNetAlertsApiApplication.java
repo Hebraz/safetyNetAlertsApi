@@ -1,5 +1,6 @@
 package com.safetynet.alerts.api;
 
+import com.safetynet.alerts.api.datasource.IAlertsDataSource;
 import com.safetynet.alerts.api.model.Person;
 import com.safetynet.alerts.api.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class SafetyNetAlertsApiApplication  implements CommandLineRunner {
 	}
 
 	@Autowired
-	private AlertsDataSource dataSource;
+	private IAlertsDataSource dataSource;
 
 	@Autowired
 	private PersonService personService;

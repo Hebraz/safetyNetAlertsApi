@@ -1,12 +1,10 @@
-package com.safetynet.alerts.api;
+package com.safetynet.alerts.api.datasource;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.model.MedicalRecord;
 import com.safetynet.alerts.api.model.Person;
-import lombok.Data;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,7 @@ import java.util.List;
  *  - give access to that loaded data
  */
 @Component
-public class AlertsDataSource {
+public class AlertsDataSource implements IAlertsDataSource {
 
     @Value( "${datasource.filepath}" )
     private String dataSourceFilePath;
@@ -49,39 +47,5 @@ public class AlertsDataSource {
         return data;
     }
 
-    /**
-     * AlertsDataSource Data class holds persons, fire stations and medical records
-     */
-    public static class Data {
-        @JsonProperty(value = "persons")
-        private List<Person> persons;
-        @JsonProperty(value = "firestations")
-        private List<FireStation> firestations;
-        @JsonProperty(value = "medicalrecords")
-        private List<MedicalRecord> medicalrecords;
 
-        public List<Person> getPersons() {
-            return persons;
-        }
-
-        public void setPersons(List<Person> persons) {
-            this.persons = persons;
-        }
-
-        public List<FireStation> getFirestations() {
-            return firestations;
-        }
-
-        public void setFirestations(List<FireStation> firestations) {
-            this.firestations = firestations;
-        }
-
-        public List<MedicalRecord> getMedicalrecords() {
-            return medicalrecords;
-        }
-
-        public void setMedicalrecords(List<MedicalRecord> medicalrecords) {
-            this.medicalrecords = medicalrecords;
-        }
-    }
 }

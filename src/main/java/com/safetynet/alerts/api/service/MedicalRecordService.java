@@ -1,6 +1,6 @@
 package com.safetynet.alerts.api.service;
 
-import com.safetynet.alerts.api.AlertsDataSource;
+import com.safetynet.alerts.api.datasource.IAlertsDataSource;
 import com.safetynet.alerts.api.model.MedicalRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,7 +13,7 @@ import java.util.Optional;
 public class MedicalRecordService implements IMedicalRecordService {
 
     @Autowired
-    private AlertsDataSource dataSource;
+    private IAlertsDataSource dataSource;
 
     /**
      * Get a person's medical record from a datasource.
