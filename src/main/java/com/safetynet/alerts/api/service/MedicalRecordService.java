@@ -3,6 +3,7 @@ package com.safetynet.alerts.api.service;
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
 import com.safetynet.alerts.api.model.MedicalRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.Optional;
  * Implementation of {@link com.safetynet.alerts.api.service.IMedicalRecordService} to get,
  * delete or save a person's medical record from/to a datasource.
  */
+@Service
 public class MedicalRecordService implements IMedicalRecordService {
 
     @Autowired

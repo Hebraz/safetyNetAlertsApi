@@ -4,6 +4,7 @@ import com.safetynet.alerts.api.datasource.IAlertsDataSource;
 import com.safetynet.alerts.api.model.Person;
 import com.safetynet.alerts.api.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,6 +24,9 @@ public class SafetyNetAlertsApiApplication  implements CommandLineRunner {
 	@Autowired
 	private PersonService personService;
 
+	@Value( "${datasource.filepath}" )
+	private String dataSourceFilePath;
+
 	@Override
 	public void run(String... args) throws Exception {
 
@@ -35,7 +39,7 @@ public class SafetyNetAlertsApiApplication  implements CommandLineRunner {
 				+ time_zone_default);
 
 
-		dataSource.load();
+		dataSource.load(dataSourceFilePath);
 		//test
 		dataSource.getData()
 				.getFirestations()

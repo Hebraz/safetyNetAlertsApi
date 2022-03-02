@@ -22,17 +22,15 @@ import java.util.List;
 @Component
 public class AlertsDataSource implements IAlertsDataSource {
 
-    @Value( "${datasource.filepath}" )
-    private String dataSourceFilePath;
-
     private Data data;
 
     /**
-     * Load SafetyNet Alerts data from Json file defined by
-     * "datasource.filepath" application property. Shall be called
-     * first before accessing to data through getData method
+     * Load SafetyNet Alerts data from Json file given in parameter.
+     * Shall be called first before accessing to data through getData method
+     *
+     * @param dataSourceFilePath path to the json data file.
      */
-    public void load() throws IOException {
+    public void load(String dataSourceFilePath) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         File resource = new ClassPathResource(dataSourceFilePath).getFile();
         data = mapper.readValue(resource, Data.class);

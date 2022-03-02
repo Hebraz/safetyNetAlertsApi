@@ -20,7 +20,7 @@ public interface IAlertsDataSource {
      * "datasource.filepath" application property. Shall be called
      * first before accessing to data through getData method
      */
-    public void load() throws IOException;
+    public void load(String dataSourceFilePath) throws IOException;
 
     /**
      * Get SafetyNet Alerts data loaded from Json file.
