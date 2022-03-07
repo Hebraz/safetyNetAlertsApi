@@ -1,7 +1,10 @@
 package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
+import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +16,11 @@ import java.util.Optional;
  * delete or save a person from/to a datasource.
  */
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PersonService implements IPersonService {
 
-    @Autowired
-    private IAlertsDataSource dataSource;
+    private final IAlertsDataSource dataSource;
+
     /**
      * Get a person from a datasource.
      *
@@ -40,7 +44,7 @@ public class PersonService implements IPersonService {
      * @param firstName first name of the person to delete.
      * @param lastName last name of the person to delete.
      *
-     * @throws IllegalArgumentException if the person does not exist in the datasource. (No person with
+     * @throws DataNotFoundException if the person does not exist in the datasource. (No person with
      * given firstName and lastName has been found).
      *
      */
@@ -52,31 +56,58 @@ public class PersonService implements IPersonService {
             person = personResult.get();
             dataSource.getData().getPersons().remove(person);
         } else {
-            throw new IllegalArgumentException(firstName + " " + lastName + " does not exist");
+            throw new DataNotFoundException("Person " + firstName + " " + lastName);
         }
     }
     /**
-     * Save a person into a datasource. If the person already exists in the
-     * datasource (with same first/last names), it is updated. Else it is created
-     * and added to the datasource.
+     * Update an existing person into a datasource.
      *
-     * @param personToSave person to save.
+     * @param personToUpdate person to update.
+     *
+     * @return updated person.
+     *
+     * @throws DataNotFoundException if the person does not exist in the datasource. (No person with
+     * same firstName and lastName has been found).
      *
      */
     @Override
-    public void savePerson(Person personToSave){
+    public Person updatePerson(Person personToUpdate){
         Person person;
-        Optional<Person> personResult = getPerson(personToSave.getFirstName(), personToSave.getLastName());
+        Optional<Person> personResult = getPerson(personToUpdate.getFirstName(), personToUpdate.getLastName());
         if(personResult.isPresent()){
             person = personResult.get();
-            person.setAddress(personToSave.getAddress());
-            person.setCity(personToSave.getCity());
-            person.setZip(personToSave.getZip());
-            person.setEmail(personToSave.getEmail());
-            person.setPhone(personToSave.getPhone());
+            person.setAddress(personToUpdate.getAddress());
+            person.setCity(personToUpdate.getCity());
+            person.setZip(personToUpdate.getZip());
+            person.setEmail(personToUpdate.getEmail());
+            person.setPhone(personToUpdate.getPhone());
         } else {
-            person = new Person(personToSave);
-            dataSource.getData().getPersons().add(person);
+            throw new DataNotFoundException("Person " + personToUpdate.getFirstName() + " " + personToUpdate.getLastName());
         }
+        return person;
+    }
+
+    /**
+     * Add a new a person into a datasource.
+     * 
+     * @param personToCreate person to add.
+     *
+     * @return added person.
+     *
+     * @throws DataAlreadyExistsException if the person already exist in the datasource. (person with
+     * same firstName and lastName has been found).
+     *
+     */
+    @Override
+    public Person createPerson(Person personToCreate){
+        Person person;
+        Optional<Person> personResult = getPerson(personToCreate.getFirstName(), personToCreate.getLastName());
+        if(personResult.isEmpty()){
+            person = new Person(personToCreate);
+            dataSource.getData().getPersons().add(person);
+        } else {
+            throw new DataAlreadyExistsException("Person " + personToCreate.getFirstName() + " " + personToCreate.getLastName());
+        }
+        return person;
     }
 }

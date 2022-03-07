@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.model.MedicalRecord;
 import com.safetynet.alerts.api.model.Person;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,19 +21,19 @@ public interface IAlertsDataSource {
      * "datasource.filepath" application property. Shall be called
      * first before accessing to data through getData method
      */
-    public void load(String dataSourceFilePath) throws IOException;
+    void load(String dataSourceFilePath) throws IOException;
 
     /**
      * Get SafetyNet Alerts data loaded from Json file.
      *
      * @return SafetyNet Alerts data or null if data have not been loaded
      */
-    public Data getData();
+    Data getData();
 
     /**
      * AlertsDataSource Data class holds persons, fire stations and medical records
      */
-    public static class Data {
+    class Data {
         @JsonProperty(value = "persons")
         private List<Person> persons;
         @JsonProperty(value = "firestations")

@@ -1,7 +1,10 @@
 package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
+import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.FireStation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +15,10 @@ import java.util.Optional;
  * delete or save a fire station mapping from/to a datasource.
  */
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class FireStationService implements IFireStationService {
 
-    @Autowired
-    private IAlertsDataSource dataSource;
+    private final IAlertsDataSource dataSource;
 
     /**
      * Get a fire station mapping from a datasource.
@@ -37,7 +40,7 @@ public class FireStationService implements IFireStationService {
      *
      * @param address address to witch the fire station is mapped.
      *
-     * @throws IllegalArgumentException if no fire station is mapped to the given address.
+     * @throws DataNotFoundException if no fire station is mapped to the given address.
      *
      */
     @Override
@@ -48,26 +51,49 @@ public class FireStationService implements IFireStationService {
             fireStation = firesStationResult.get();
             dataSource.getData().getFirestations().remove(fireStation);
         } else {
-            throw new IllegalArgumentException("No fire station is mapped to address: " + address);
+            throw new DataNotFoundException("Fire station at " + address);
         }
     }
     /**
-     * Save a fire station into a datasource. If a fire station is already mapped to the given
-     * address, then its number is updated. Else it is created and added to the datasource.
+     * Update a fire station into a datasource.
      *
-     * @param fireStationToSave fire station to save.
+     * @param fireStationToUpdate fire station to update.
      *
+     * @return updated fire station.
+     *
+     *  @throws DataNotFoundException if fire station to update does not exist : no fire station at the given address.
      */
     @Override
-    public void saveFireStation(FireStation fireStationToSave) {
+    public FireStation updateFireStation(FireStation fireStationToUpdate) {
         FireStation fireStation;
-        Optional<FireStation> firesStationResult = getFireStation(fireStationToSave.getAddress());
+        Optional<FireStation> firesStationResult = getFireStation(fireStationToUpdate.getAddress());
         if (firesStationResult.isPresent()) {
             fireStation = firesStationResult.get();
-            fireStation.setStation(fireStationToSave.getStation());
+            fireStation.setStation(fireStationToUpdate.getStation());
+            return fireStation;
         } else {
-            fireStation = new FireStation(fireStationToSave);
+            throw new DataNotFoundException("Fire station at " + fireStationToUpdate.getAddress());
+        }
+    }
+
+    /**
+     * Create a fire station into a datasource.
+     *
+     * @param fireStationToCreate fire station to create.
+     *
+     * @return created fire station.
+     *
+     *  @throws DataAlreadyExistsException if fire station to create already exists at the given address.
+     */
+    public FireStation createFireStation(FireStation fireStationToCreate) {
+        FireStation fireStation;
+        Optional<FireStation> firesStationResult = getFireStation(fireStationToCreate.getAddress());
+        if (firesStationResult.isEmpty()) {
+            fireStation = new FireStation(fireStationToCreate);
             dataSource.getData().getFirestations().add(fireStation);
+            return fireStation;
+        } else {
+            throw new DataAlreadyExistsException("Fire station at " + fireStationToCreate.getAddress());
         }
     }
 }

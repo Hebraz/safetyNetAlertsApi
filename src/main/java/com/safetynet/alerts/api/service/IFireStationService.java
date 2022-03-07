@@ -2,7 +2,8 @@ package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.model.Person;
-
+import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.exception.DataNotFoundException;
 import java.util.Optional;
 
 /**
@@ -22,17 +23,29 @@ public interface IFireStationService {
      *
      * @param address address to witch the fire station is mapped.
      *
-     * @throws IllegalArgumentException if no fire station is mapped to the given address.
+     * @throws DataNotFoundException if no fire station is mapped to the given address.
      *
      */
     public void deleteFireStation(final String address);
     /**
-     * Save a fire station into a datasource. If a fire station is already mapped to the given
-     * address, then its number is updated. Else it is created and added to the datasource.
+     * Update a fire station into a datasource.
      *
-     * @param fireStationToSave fire station to save.
+     * @param fireStationToUpdate fire station to update.
      *
+     * @return updated fire station.
+     *
+     *  @throws DataNotFoundException if fire station to update does not exist : no fire station at the given address.
      */
-    public void saveFireStation(FireStation fireStationToSave);
+    public FireStation updateFireStation(FireStation fireStationToUpdate);
+    /**
+     * Create a fire station into a datasource.
+     *
+     * @param fireStationToCreate fire station to create.
+     *
+     * @return created fire station.
+     *
+     *  @throws DataAlreadyExistsException if fire station to create already exists at the given address.
+     */
+    public FireStation createFireStation(FireStation fireStationToCreate);
 }
 

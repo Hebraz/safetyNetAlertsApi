@@ -77,7 +77,7 @@ class FireStationServiceTest {
     }
 
     @Test
-    void saveFireStationAddNewStation(){
+    void createFireStationAddNewStation(){
         //check number of firestation
         assertEquals(4, alertsDataSource.getData().getFirestations().stream().count());
 
@@ -86,7 +86,7 @@ class FireStationServiceTest {
         fireStation.setStation(145);
 
         //Act
-        assertDoesNotThrow(()-> fireStationService.saveFireStation(fireStation));
+        assertDoesNotThrow(()-> fireStationService.createFireStation(fireStation));
 
         //check
         assertEquals(5, alertsDataSource.getData().getFirestations().stream().count());
@@ -95,7 +95,7 @@ class FireStationServiceTest {
     }
 
     @Test
-    void saveFireStationUpdateExistingStation(){
+    void updateFireStationUpdateExistingStation(){
         //check number of firestation
         assertEquals(4, alertsDataSource.getData().getFirestations().stream().count());
         assertEquals(2, alertsDataSource.getData().getFirestations().get(1).getStation());
@@ -106,7 +106,7 @@ class FireStationServiceTest {
         fireStation.setStation(15);
 
         //Act
-        assertDoesNotThrow(()-> fireStationService.saveFireStation(fireStation));
+        assertDoesNotThrow(()-> fireStationService.updateFireStation(fireStation));
 
         //check
         assertEquals(4, alertsDataSource.getData().getFirestations().stream().count());

@@ -1,7 +1,10 @@
 package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
+import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.MedicalRecord;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +15,10 @@ import java.util.Optional;
  * delete or save a person's medical record from/to a datasource.
  */
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MedicalRecordService implements IMedicalRecordService {
 
-    @Autowired
-    private IAlertsDataSource dataSource;
+    private final IAlertsDataSource dataSource;
 
     /**
      * Get a person's medical record from a datasource.
@@ -41,7 +44,7 @@ public class MedicalRecordService implements IMedicalRecordService {
      * @param firstName first name of the person.
      * @param lastName last name of the person.
      *
-     * @throws IllegalArgumentException if medical record does not exist in the datasource. (No medical record
+     * @throws DataNotFoundException if medical record does not exist in the datasource. (No medical record
      * belonging to the given person has been found).
      *
      */
@@ -53,29 +56,50 @@ public class MedicalRecordService implements IMedicalRecordService {
             medicalRecord = medicalRecordResult.get();
             dataSource.getData().getMedicalrecords().remove(medicalRecord);
         } else {
-            throw new IllegalArgumentException("No medical record found for " + firstName + " " + lastName );
+            throw new DataNotFoundException("Medical record of " + firstName + " " + lastName);
         }
     }
     /**
-     * Save a person's medical record into a datasource. If a medical record already exists for the person
-     * in the datasource (with same first/last names), it is updated. Else it is created
-     * and added to the datasource.
+     * Update an existing person's medical record into a datasource.
      *
-     * @param medicalRecordToSave medical record to save.
+     * @param medicalRecordToUpdate medical record to update.
      *
+     * @return updated medical record
+     *
+     * @throws DataNotFoundException if medical record does not exist in the datasource. (No medical record
+     *           belonging to the given person has been found).
      */
-    @Override
-    public void saveMedicalRecord(MedicalRecord medicalRecordToSave) {
+    public MedicalRecord updateMedicalRecord(MedicalRecord medicalRecordToUpdate){
         MedicalRecord medicalRecord;
-        Optional<MedicalRecord> medicalRecordResult = getMedicalRecord(medicalRecordToSave.getFirstName(), medicalRecordToSave.getLastName());
+        Optional<MedicalRecord> medicalRecordResult = getMedicalRecord(medicalRecordToUpdate.getFirstName(), medicalRecordToUpdate.getLastName());
         if(medicalRecordResult.isPresent()){
             medicalRecord = medicalRecordResult.get();
-            medicalRecord.setBirthdate(medicalRecordToSave.getBirthdate());
-            medicalRecord.setMedications(medicalRecordToSave.getMedications());
-            medicalRecord.setAllergies(medicalRecordToSave.getAllergies());
+            medicalRecord.setBirthdate(medicalRecordToUpdate.getBirthdate());
+            medicalRecord.setMedications(medicalRecordToUpdate.getMedications());
+            medicalRecord.setAllergies(medicalRecordToUpdate.getAllergies());
         } else {
-            medicalRecord = new MedicalRecord(medicalRecordToSave);
-            dataSource.getData().getMedicalrecords().add(medicalRecord);
+            throw new DataNotFoundException("Medical record of " + medicalRecordToUpdate.getFirstName() + " " + medicalRecordToUpdate.getLastName());
         }
+        return medicalRecord;
+    }
+    /**
+     * Create a person's medical record into a datasource.
+     *
+     * @param medicalRecordToCreate medical record to create.
+     *
+     * @return created medical record.
+     *
+     * @throws DataAlreadyExistsException if medical record already exists in datasource.
+     */
+    public MedicalRecord createMedicalRecord(MedicalRecord medicalRecordToCreate) {
+        MedicalRecord medicalRecord;
+        Optional<MedicalRecord> medicalRecordResult = getMedicalRecord(medicalRecordToCreate.getFirstName(), medicalRecordToCreate.getLastName());
+        if (medicalRecordResult.isEmpty()) {
+            medicalRecord = new MedicalRecord(medicalRecordToCreate);
+            dataSource.getData().getMedicalrecords().add(medicalRecord);
+        } else {
+            throw new DataAlreadyExistsException("Medical record of " + medicalRecordToCreate.getFirstName() + " " + medicalRecordToCreate.getLastName());
+        }
+        return medicalRecord;
     }
 }

@@ -1,7 +1,7 @@
 package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
-import com.safetynet.alerts.api.model.FireStation;
+import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,19 +74,19 @@ class PersonServiceTest {
 
     @Test
     void deletePersonNullFirstName() {
-        assertThrows(IllegalArgumentException.class,() -> personService.deletePerson(null,"Zemicks"));
+        assertThrows(DataNotFoundException.class,() -> personService.deletePerson(null,"Zemicks"));
     }
     @Test
     void deletePersonNullLastName(){
-        assertThrows(IllegalArgumentException.class,() -> personService.deletePerson("Sophia",null));
+        assertThrows(DataNotFoundException.class,() -> personService.deletePerson("Sophia",null));
     }
     @Test
     void deletePersonUnknownFirstName() {
-        assertThrows(IllegalArgumentException.class,() -> personService.deletePerson("Sophie","Zemicks"));
+        assertThrows(DataNotFoundException.class,() -> personService.deletePerson("Sophie","Zemicks"));
     }
     @Test
     void deletePersonUnknownLastName() {
-        assertThrows(IllegalArgumentException.class,() -> personService.deletePerson("Sophia","Zemick"));
+        assertThrows(DataNotFoundException.class,() -> personService.deletePerson("Sophia","Zemick"));
     }
     @Test
     void deletePersonOk() {
@@ -99,7 +99,7 @@ class PersonServiceTest {
         //check number of persons has decreased
         assertEquals(6,  alertsDataSource.getData().getPersons().stream().count());
         //try to delete person another time shall throw exception
-        assertThrows(IllegalArgumentException.class,() -> personService.deletePerson("Sophia", "Zemicks"));
+        assertThrows(DataNotFoundException.class,() -> personService.deletePerson("Sophia", "Zemicks"));
     }
 
     @Test

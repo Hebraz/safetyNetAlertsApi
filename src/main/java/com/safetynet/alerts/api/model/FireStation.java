@@ -1,12 +1,16 @@
 package com.safetynet.alerts.api.model;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+
 /**
  * Fire station entity
  *
  */
+@FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 public class FireStation {
-    private String address;
-    private int station;
+    String address;
+    int station;
 
     public FireStation(){}
 
