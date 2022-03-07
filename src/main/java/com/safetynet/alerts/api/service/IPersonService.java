@@ -1,9 +1,10 @@
 package com.safetynet.alerts.api.service;
 
-import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.exception.DataNotFoundException;
+import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.service.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -29,7 +30,7 @@ public interface IPersonService {
      * given firstName and lastName has been found).
      *
      */
-    public void deletePerson(final String firstName, final String lastName);
+    public void deletePerson(final String firstName, final String lastName) throws DataNotFoundException;
     /**
      * Update an existing person into a datasource.
      *
@@ -41,7 +42,7 @@ public interface IPersonService {
      * same firstName and lastName has been found).
      *
      */
-    public Person updatePerson(Person personToUpdate);
+    public Person updatePerson(Person personToUpdate) throws DataNotFoundException;
     /**
      * Add a new a person into a datasource.
      *
@@ -53,5 +54,13 @@ public interface IPersonService {
      * same firstName and lastName has been found).
      *
      */
-    public Person createPerson(Person personToCreate);
+    public Person createPerson(Person personToCreate) throws DataAlreadyExistsException;
+    /**
+     * Get a list of persons that leave to a given address.
+     *
+     * @param address the address.
+     *
+     * @return list of Person object.
+     */
+    List<Person> getPersonsByAddress(String address);
 }

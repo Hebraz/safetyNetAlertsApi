@@ -1,15 +1,17 @@
 package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
-import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.exception.DataNotFoundException;
+import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.service.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link com.safetynet.alerts.api.service.IPersonService} to get,
@@ -49,7 +51,7 @@ public class PersonService implements IPersonService {
      *
      */
     @Override
-    public void deletePerson(final String firstName, final String lastName){
+    public void deletePerson(final String firstName, final String lastName) throws DataNotFoundException {
         Person person;
         Optional<Person> personResult = getPerson(firstName, lastName);
         if(personResult.isPresent()){
@@ -71,7 +73,7 @@ public class PersonService implements IPersonService {
      *
      */
     @Override
-    public Person updatePerson(Person personToUpdate){
+    public Person updatePerson(Person personToUpdate) throws DataNotFoundException {
         Person person;
         Optional<Person> personResult = getPerson(personToUpdate.getFirstName(), personToUpdate.getLastName());
         if(personResult.isPresent()){
@@ -99,7 +101,7 @@ public class PersonService implements IPersonService {
      *
      */
     @Override
-    public Person createPerson(Person personToCreate){
+    public Person createPerson(Person personToCreate) throws DataAlreadyExistsException {
         Person person;
         Optional<Person> personResult = getPerson(personToCreate.getFirstName(), personToCreate.getLastName());
         if(personResult.isEmpty()){
@@ -109,5 +111,20 @@ public class PersonService implements IPersonService {
             throw new DataAlreadyExistsException("Person " + personToCreate.getFirstName() + " " + personToCreate.getLastName());
         }
         return person;
+    }
+
+    /**
+     * Get a list of persons that leave to a given address.
+     *
+     * @param address the address.
+     *
+     * @return list of Person object.
+     */
+    @Override
+    public List<Person> getPersonsByAddress(String address){
+        List<Person> persons = dataSource.getData().getPersons();
+        return persons.stream()
+                .filter(p -> p.getAddress().equals(address))
+                .collect(Collectors.toList());
     }
 }

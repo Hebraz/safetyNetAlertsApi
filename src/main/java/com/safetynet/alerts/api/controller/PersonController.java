@@ -1,8 +1,7 @@
 package com.safetynet.alerts.api.controller;
 
-import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.exception.DataNotFoundException;
-import com.safetynet.alerts.api.exception.ServiceException;
+import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.service.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
 import com.safetynet.alerts.api.service.IPersonService;
 import com.safetynet.alerts.api.utils.IRequestLogger;
@@ -25,7 +24,7 @@ public class PersonController {
     private final IRequestLogger requestLogger;
 
     /**
-     * Delete - Delete a person.
+     * Delete a person.
      *
      * @param firstName - The first name of the person to delete
      * @param lastName - The last name of the person to delete
@@ -52,7 +51,7 @@ public class PersonController {
     }
 
     /**
-     * Create - Add a new person.
+     * Add a new person.
      *
      * @param person An object Person
      *
@@ -82,7 +81,7 @@ public class PersonController {
     }
 
     /**
-     * Update - Update an existing person.
+     * Update an existing person.
      *
      * @param person An object Person
      *

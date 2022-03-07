@@ -119,7 +119,7 @@ class MedicalRecordServiceTest {
         //check count before
         assertEquals(4, alertsDataSource.getData().getMedicalrecords().stream().count());
         //Act
-        assertDoesNotThrow(()-> medicalRecordService.saveMedicalRecord(medicalRecordToSave));
+        assertDoesNotThrow(()-> medicalRecordService.createMedicalRecord(medicalRecordToSave));
         //check count after
         MedicalRecord addedMedicalRecord =   alertsDataSource.getData().getMedicalrecords().get(4);
         assertEquals(5, alertsDataSource.getData().getMedicalrecords().stream().count());
@@ -138,7 +138,7 @@ class MedicalRecordServiceTest {
         //check count before
         assertEquals(4, alertsDataSource.getData().getMedicalrecords().stream().count());
         //Act
-        assertDoesNotThrow(()-> medicalRecordService.saveMedicalRecord(medicalRecordToSave));
+        assertDoesNotThrow(()-> medicalRecordService.updateMedicalRecord(medicalRecordToSave));
         //check count after
         MedicalRecord updatedMedicalRecord =   alertsDataSource.getData().getMedicalrecords().get(2);
         assertEquals(4, alertsDataSource.getData().getMedicalrecords().stream().count());

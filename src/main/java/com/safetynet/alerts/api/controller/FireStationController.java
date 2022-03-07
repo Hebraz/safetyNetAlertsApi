@@ -1,8 +1,8 @@
 package com.safetynet.alerts.api.controller;
 
-import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.exception.DataNotFoundException;
-import com.safetynet.alerts.api.exception.ServiceException;
+import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
+import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.service.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.service.IFireStationService;
 import com.safetynet.alerts.api.utils.IRequestLogger;
@@ -25,9 +25,9 @@ public class FireStationController {
     private final IRequestLogger requestLogger;
 
     /**
-     * Delete - Delete a fire station  mapping.
+     * Delete a fire station  mapping.
      *
-     * @param address -  address to witch the fire station is mapped.
+     * @param address -  address to which the fire station is mapped.
      *
      * @return  HTTP response with :
      *            - empty Body
@@ -36,7 +36,7 @@ public class FireStationController {
      * @throws DataNotFoundException if no fire station is mapped to the given address in datasource
      */
     @DeleteMapping("/firestation/{address}")
-    public ResponseEntity<String> deleteFireStation(@PathVariable("address") final String address) {
+    public ResponseEntity<String> deleteFireStation(@PathVariable("address") final String address) throws DataNotFoundException {
         requestLogger.logRequest("DELETE /firestation/"+address);
         try{
             fireStationService.deleteFireStation(address);
@@ -49,18 +49,18 @@ public class FireStationController {
     }
 
     /**
-     * Create - Add a new fire station mapping to datasource.
+     * Add a new fire station mapping to datasource.
      *
      * @param fireStation - An object FireStation
      *
      * @return  HTTP response with :
-     *              Body : the created FireStation object
+     *              empty Body
      *              Http status code : "201-Created" if fire station mapping have been created
      *
      * @throws DataAlreadyExistsException if a fire station is already mapped to the given address
      */
     @PostMapping("/firestation")
-    public ResponseEntity<FireStation> createFireStation(@RequestBody FireStation fireStation) {
+    public ResponseEntity<String> createFireStation(@RequestBody FireStation fireStation) throws DataAlreadyExistsException {
         requestLogger.logRequest("POST /firestation/"+ fireStation.getAddress());
         try{
             FireStation createdFireStation = fireStationService.createFireStation(fireStation);
@@ -78,22 +78,44 @@ public class FireStationController {
     }
 
     /**
-     * Update - Update an existing fire station mapping
+     * Update an existing fire station mapping
      * @param fireStation An object FireStation
      *
      * HTTP response with :
-     *              Body : the updated FireStation object
+     *              empty Body
      *              Http status code : "200-Ok" if fire station mapping have been updated.
      *
      * @throws DataNotFoundException if no fire station is mapped to given address in datasource
      */
     @PutMapping("/firestation")
-    public  ResponseEntity<FireStation>  updateFireStation(@RequestBody FireStation fireStation) {
+    public  ResponseEntity<String>  updateFireStation(@RequestBody FireStation fireStation) throws DataNotFoundException {
         requestLogger.logRequest("PUT /firestation/"+ fireStation.getAddress());
         try  {
             fireStationService.updateFireStation(fireStation);
             requestLogger.logResponseSuccess(HttpStatus.OK,null);
             return ResponseEntity.ok().build();
+        } catch (DataNotFoundException e){
+            requestLogger.logResponseFailure(e.getHttpStatus() ,e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Get the list of persons that depends on the given fire station.
+     *
+     * @param stationNumber the number of the fire station
+     *
+     * HTTP response with :
+     *              Body : an object {@link com.safetynet.alerts.api.model.dto.FireStationPersonsDto}
+     *              Http status code : "200-Ok" .
+     *
+     * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
+     */
+    @GetMapping("/firestation")
+    public ResponseEntity<FireStationPersonsDto> GetFireStationPersons(@RequestParam Integer stationNumber) throws DataNotFoundException {
+        try{
+            FireStationPersonsDto fireStationPersons = fireStationService.getPersons(stationNumber);
+            return ResponseEntity.ok(fireStationPersons);
         } catch (DataNotFoundException e){
             requestLogger.logResponseFailure(e.getHttpStatus() ,e.getMessage());
             throw e;

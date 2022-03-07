@@ -1,7 +1,7 @@
 package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
-import com.safetynet.alerts.api.exception.DataNotFoundException;
+import com.safetynet.alerts.api.service.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,7 +110,7 @@ class PersonServiceTest {
         //check count before
         assertEquals(7, alertsDataSource.getData().getPersons().stream().count());
         //Act
-        assertDoesNotThrow(()-> personService.savePerson(personToSave));
+        assertDoesNotThrow(()-> personService.createPerson(personToSave));
         //check count after
         Person addedPerson = alertsDataSource.getData().getPersons().get(7);
         assertEquals(8, alertsDataSource.getData().getPersons().stream().count());
@@ -131,7 +131,7 @@ class PersonServiceTest {
         //check count before
         assertEquals(7, alertsDataSource.getData().getPersons().stream().count());
         //Act
-        assertDoesNotThrow(()-> personService.savePerson(personToSave));
+        assertDoesNotThrow(()-> personService.createPerson(personToSave));
         //check count after
         Person addedPerson = alertsDataSource.getData().getPersons().get(7);
         assertEquals(8, alertsDataSource.getData().getPersons().stream().count());
@@ -152,7 +152,7 @@ class PersonServiceTest {
         //check count before
         assertEquals(7, alertsDataSource.getData().getPersons().stream().count());
         //Act
-        assertDoesNotThrow(()-> personService.savePerson(personToSave));
+        assertDoesNotThrow(()-> personService.updatePerson(personToSave));
         //check count after
         Person updatedPerson = alertsDataSource.getData().getPersons().get(1);
         assertEquals(7, alertsDataSource.getData().getPersons().stream().count());

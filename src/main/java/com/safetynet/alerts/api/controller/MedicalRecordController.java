@@ -1,8 +1,7 @@
 package com.safetynet.alerts.api.controller;
 
-import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.exception.DataNotFoundException;
-import com.safetynet.alerts.api.exception.ServiceException;
+import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.service.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.MedicalRecord;
 import com.safetynet.alerts.api.service.IMedicalRecordService;
 import com.safetynet.alerts.api.utils.IRequestLogger;
@@ -26,7 +25,7 @@ public class MedicalRecordController {
     private final IRequestLogger requestLogger;
 
     /**
-     * Delete - Delete a medical record of a person.
+     * Delete a medical record of a person.
      *
      * @param firstName - The first name of the person
      * @param lastName - The last name of the person
@@ -39,7 +38,7 @@ public class MedicalRecordController {
      */
     @DeleteMapping("/medicalRecord/{firstName}/{lastName}")
     public ResponseEntity<String> deleteMedicalRecord(@PathVariable("firstName") final String firstName,
-                                                        @PathVariable("lastName") final String lastName) {
+                                                        @PathVariable("lastName") final String lastName) throws DataNotFoundException {
         requestLogger.logRequest("DELETE /medicalRecord/"+firstName+"/"+lastName);
         try{
             medicalRecordService.deleteMedicalRecord(firstName, lastName);
@@ -52,7 +51,7 @@ public class MedicalRecordController {
     }
 
     /**
-     * Create - Add a new medical record.
+     * Add a new medical record.
      *
      * @param medicalRecord An object medicalRecord
      *
@@ -63,7 +62,7 @@ public class MedicalRecordController {
      * @throws DataAlreadyExistsException if a medical record for the given person already exists
      */
     @PostMapping("/medicalRecord")
-    public ResponseEntity<MedicalRecord> createMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
+    public ResponseEntity<MedicalRecord> createMedicalRecord(@RequestBody MedicalRecord medicalRecord) throws DataAlreadyExistsException {
         requestLogger.logRequest("POST /medicalRecord/"+ medicalRecord.getFirstName()+"/"+medicalRecord.getLastName());
         try{
             MedicalRecord createdMedicalRecord = medicalRecordService.createMedicalRecord(medicalRecord);
@@ -81,7 +80,7 @@ public class MedicalRecordController {
     }
 
     /**
-     * Update - Update an existing medical record.
+     * Update an existing medical record.
      *
      * @param medicalRecord An object medicalRecord
      *
@@ -92,7 +91,7 @@ public class MedicalRecordController {
      * @throws DataNotFoundException if no medical record for the given person exists in datasource
      */
     @PutMapping("/medicalRecord")
-    public  ResponseEntity<MedicalRecord>  updateMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
+    public  ResponseEntity<MedicalRecord>  updateMedicalRecord(@RequestBody MedicalRecord medicalRecord) throws DataNotFoundException {
         requestLogger.logRequest("PUT /medicalRecord/"+ medicalRecord.getFirstName()+"/"+medicalRecord.getLastName());
         try  {
             medicalRecordService.updateMedicalRecord(medicalRecord);
