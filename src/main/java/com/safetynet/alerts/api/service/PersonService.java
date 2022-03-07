@@ -1,10 +1,13 @@
 package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
+import com.safetynet.alerts.api.model.dto.ChildAlertDto;
 import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.service.exception.DataIllegalValueException;
 import com.safetynet.alerts.api.service.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +22,11 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Log4j2
 public class PersonService implements IPersonService {
 
     private final IAlertsDataSource dataSource;
-
+    private final IMedicalRecordService medicalRecordService;
     /**
      * Get a person from a datasource.
      *
@@ -126,5 +130,39 @@ public class PersonService implements IPersonService {
         return persons.stream()
                 .filter(p -> p.getAddress().equals(address))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a list of children that leave to a given address.
+     *
+     * @param address the address
+     *
+     * @return a {@link com.safetynet.alerts.api.model.dto.ChildAlertDto} object
+     *
+     */
+    public ChildAlertDto getChildren(String address){
+        ChildAlertDto children = new ChildAlertDto();
+        List<Person> persons = this.getPersonsByAddress(address);
+        for(Person p : persons){
+            try{
+                long personAge = medicalRecordService.getPersonAge(p.getFirstName(),p.getLastName());
+                if(personAge > 18) {
+                    ChildAlertDto.Adult adult = new ChildAlertDto.Adult();
+                    adult.setFirstName(p.getFirstName());
+                    adult.setLastName(p.getLastName());
+                    children.getAdults().add(adult);
+                } else {
+                    ChildAlertDto.Child child = new ChildAlertDto.Child();
+                    child.setFirstName(p.getFirstName());
+                    child.setLastName(p.getLastName());
+                    child.setAge(personAge);
+                    child.setPhone(p.getPhone());
+                    children.getChildren().add(child);
+                }
+            } catch (DataIllegalValueException | DataNotFoundException e) {
+                log.error("Failed to get the age of " + p.getFirstName() + " " + p.getLastName() + ": " + e.getMessage());
+            }
+        }
+        return children;
     }
 }

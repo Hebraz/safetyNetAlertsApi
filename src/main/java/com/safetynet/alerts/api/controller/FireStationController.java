@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  *  Fire station endpoint
@@ -112,10 +113,36 @@ public class FireStationController {
      * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
      */
     @GetMapping("/firestation")
-    public ResponseEntity<FireStationPersonsDto> GetFireStationPersons(@RequestParam Integer stationNumber) throws DataNotFoundException {
+    public ResponseEntity<FireStationPersonsDto> getFireStationPersons(@RequestParam Integer stationNumber) throws DataNotFoundException {
+        requestLogger.logRequest("GET /firestation?stationNumber="+ stationNumber);
         try{
             FireStationPersonsDto fireStationPersons = fireStationService.getPersons(stationNumber);
+            requestLogger.logResponseSuccess(HttpStatus.OK ,"");
             return ResponseEntity.ok(fireStationPersons);
+        } catch (DataNotFoundException e){
+            requestLogger.logResponseFailure(e.getHttpStatus() ,e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Get the list of phone numbers of people that depend on the given fire station.
+     *
+     * @param firestation the number of the fire station
+     *
+     * HTTP response with :
+     *              Body : a list of phone numbers
+     *              Http status code : "200-Ok" .
+     *
+     * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
+     */
+    @GetMapping("/phoneAlert")
+    public ResponseEntity<List<String>> getPhoneAlert(@RequestParam Integer firestation) throws DataNotFoundException {
+        requestLogger.logRequest("GET /phoneAlert?firestation="+ firestation);
+        try{
+            List<String> phones = fireStationService.getPhones(firestation);
+            requestLogger.logResponseSuccess(HttpStatus.OK ,"");
+            return ResponseEntity.ok(phones);
         } catch (DataNotFoundException e){
             requestLogger.logResponseFailure(e.getHttpStatus() ,e.getMessage());
             throw e;

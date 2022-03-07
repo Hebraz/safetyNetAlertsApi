@@ -21,7 +21,7 @@
         { "firstName":"Brian", "lastName":"Stelzer", "address":"947 E. Rose Dr", "city":"Culver", "zip":"97451", "phone":"841-874-7784", "email":"bstel@email.com" },
         { "firstName":"Shawna", "lastName":"Stelzer", "address":"947 E. Rose Dr", "city":"Culver", "zip":"97451", "phone":"841-874-7784", "email":"ssanw@email.com" },
         { "firstName":"Kendrik", "lastName":"Stelzer", "address":"947 E. Rose Dr", "city":"Culver", "zip":"97451", "phone":"841-874-7784", "email":"bstel@email.com" },
-        { "firstName":"Clive", "lastName":"Ferguson", "address":"748 Townings Dr", "city":"Culver", "zip":"97451", "phone":"841-874-6741", "email":"clivfd@ymail.com" },
+        { "firstName":"Clive", "lastName":"Ferguson", "address":"48 Townings Dr", "city":"Culver", "zip":"97451", "phone":"841-874-6741", "email":"clivfd@ymail.com" },
         { "firstName":"Eric", "lastName":"Cadigan", "address":"951 LoneTree Rd", "city":"Culver", "zip":"97451", "phone":"841-874-7458", "email":"gramps@email.com" }
 	], 
     "firestations": [

@@ -1,5 +1,6 @@
 package com.safetynet.alerts.api.service;
 
+import com.safetynet.alerts.api.model.dto.ChildAlertDto;
 import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.service.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
@@ -63,4 +64,14 @@ public interface IPersonService {
      * @return list of Person object.
      */
     List<Person> getPersonsByAddress(String address);
+    /**
+     * Get a list of children that leave to a given address.
+     *
+     * @param address the address
+     *
+     * @return a {@link com.safetynet.alerts.api.model.dto.ChildAlertDto} object
+     *
+     */
+    public ChildAlertDto getChildren(String address);
+
 }

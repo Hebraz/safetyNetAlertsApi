@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class DataNotFoundException extends ServiceException{
     public DataNotFoundException(String dataName){
-        super("Person '" + dataName + "' does not exist !");
+        super("Data '" + dataName + "' does not exist !");
     }
 
     @Override

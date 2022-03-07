@@ -12,6 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,10 +53,12 @@ public class FireStationService implements IFireStationService {
      * @return a list of addresses, may be empty
      *
      */
-     public  List<FireStation> getAddresses(Integer stationNumber){
+     @Override
+     public  List<String> getAddresses(Integer stationNumber){
          List<FireStation> fireStations = dataSource.getData().getFirestations();
          return fireStations.stream()
                             .filter(f -> stationNumber.equals(f.getStation()))
+                            .map(f -> f.getAddress())
                             .collect(Collectors.toList());
      }
 
@@ -131,15 +134,15 @@ public class FireStationService implements IFireStationService {
      * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
      */
     public FireStationPersonsDto getPersons(Integer stationNumber) throws DataNotFoundException {
-        final List<FireStation> fireStations = this.getAddresses(stationNumber);
-        if(! fireStations.isEmpty()){
+        final List<String> fireStationAddresses = this.getAddresses(stationNumber);
+        if(! fireStationAddresses.isEmpty()){
 
             FireStationPersonsDto fireStationPersonsDto = new FireStationPersonsDto();
             int numberOfAdults = 0;
             int numberOfChildren = 0;
 
-            for(FireStation fireStation : fireStations){
-                List<Person> persons = personService.getPersonsByAddress(fireStation.getAddress());
+            for(String fireStationAddress : fireStationAddresses){
+                List<Person> persons = personService.getPersonsByAddress(fireStationAddress);
                 if(! persons.isEmpty()){
                     List<FireStationPersonsDto.FireStationPerson> fireStationPersons =
                         persons.stream().map(p -> {
@@ -170,7 +173,29 @@ public class FireStationService implements IFireStationService {
             fireStationPersonsDto.setNumberOfChildren(numberOfChildren);
             return fireStationPersonsDto;
         } else {
-            throw new DataNotFoundException("Fire station of number " + stationNumber);
+            throw new DataNotFoundException("Fire station number " + stationNumber);
+        }
+    }
+
+    /**
+     * Get the list of phone numbers of people that depends on the given fire station.
+     *
+     * @param stationNumber the number of the fire station
+     * @return a list of phone numbers
+     * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
+     */
+    @Override
+    public List<String> getPhones(Integer stationNumber) throws DataNotFoundException {
+        List<String> phones = new ArrayList<>();
+        final List<String> fireStationAddresses = this.getAddresses(stationNumber);
+        if (!fireStationAddresses.isEmpty()) {
+            for (String fireStationAddress : fireStationAddresses) {
+                List<Person> persons = personService.getPersonsByAddress(fireStationAddress);
+                persons.stream().forEach(p -> phones.add(p.getPhone()));
+            }
+            return phones;
+        }else {
+            throw new DataNotFoundException("Fire station number " + stationNumber);
         }
     }
 }

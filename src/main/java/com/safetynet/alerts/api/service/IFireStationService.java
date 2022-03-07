@@ -4,6 +4,8 @@ import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
 import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.service.exception.DataNotFoundException;
+
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -18,6 +20,17 @@ public interface IFireStationService {
      * @return the fire station mapping if found.
      */
     public Optional<FireStation> getFireStation(final String address);
+
+    /**
+     * Get the list of addresses covered by one fire station.
+     *
+     * @param stationNumber the number of the fire station
+     *
+     * @return a list of addresses, may be empty
+     *
+     */
+    List<String> getAddresses(Integer stationNumber);
+
     /**
      * Delete a fire station mapping.
      *
@@ -57,5 +70,16 @@ public interface IFireStationService {
      * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
      */
     FireStationPersonsDto getPersons(Integer stationNumber) throws DataNotFoundException;
+
+    /**
+     * Get the list of phone numbers of people that depends on the given fire station.
+     *
+     * @param stationNumber the number of the fire station
+     *
+     * @return a list of phone numbers
+     *
+     * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
+     */
+    List<String> getPhones(Integer stationNumber) throws DataNotFoundException;
 }
 

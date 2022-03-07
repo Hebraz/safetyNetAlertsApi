@@ -1,5 +1,7 @@
 package com.safetynet.alerts.api.controller;
 
+import com.safetynet.alerts.api.model.dto.ChildAlertDto;
+import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
 import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.service.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
+import java.util.List;
 
 /**
  *  Person endpoint
@@ -38,7 +41,7 @@ public class PersonController {
      */
     @DeleteMapping("/person/{firstName}/{lastName}")
     public ResponseEntity<String> deletePerson(@PathVariable("firstName") final String firstName,
-                                               @PathVariable("lastName") final String lastName) {
+                                               @PathVariable("lastName") final String lastName) throws DataNotFoundException {
         requestLogger.logRequest("DELETE /person/"+firstName+"/"+lastName);
         try{
             personService.deletePerson(firstName, lastName);
@@ -63,7 +66,7 @@ public class PersonController {
      *                                      already exists in datasource
      */
     @PostMapping("/person")
-    public ResponseEntity<Person> createPerson(@RequestBody Person person) {
+    public ResponseEntity<Person> createPerson(@RequestBody Person person) throws DataAlreadyExistsException {
         requestLogger.logRequest("POST /person/"+ person.getFirstName()+"/"+person.getLastName());
         try{
             Person createdPerson = personService.createPerson(person);
@@ -93,7 +96,7 @@ public class PersonController {
      *                                exists in datasource
      */
     @PutMapping("/person")
-    public  ResponseEntity<Person>  updatePerson(@RequestBody Person person) {
+    public  ResponseEntity<Person>  updatePerson(@RequestBody Person person) throws DataNotFoundException {
         requestLogger.logRequest("PUT /person/"+ person.getFirstName()+"/"+person.getLastName());
         try  {
             personService.updatePerson(person);
@@ -102,6 +105,28 @@ public class PersonController {
         } catch (DataNotFoundException e){
             requestLogger.logResponseFailure(e.getHttpStatus() ,e.getMessage());
             throw e;
+        }
+    }
+
+    /**
+     * Get a list of children that leave to a given address.
+     *
+     * @param address the address
+     *
+     * HTTP response with :
+     *              Body : an object {@link com.safetynet.alerts.api.model.dto.ChildAlertDto}
+     *              Http status code : "200-Ok" .
+     */
+    @GetMapping("/childAlert")
+    public ResponseEntity<ChildAlertDto> getChildrenAtAddress(@RequestParam String address) {
+        requestLogger.logRequest("GET /childAlert?address="+ address);
+        ChildAlertDto childAlertDto = personService.getChildren(address.trim());
+        if(childAlertDto.getChildren().isEmpty()){
+            requestLogger.logResponseSuccess(HttpStatus.OK, "");
+            return  ResponseEntity.ok().build();
+        } else {
+            requestLogger.logResponseSuccess(HttpStatus.OK, "");
+            return ResponseEntity.ok(childAlertDto);
         }
     }
 }
