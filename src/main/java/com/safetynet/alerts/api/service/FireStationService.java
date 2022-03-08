@@ -3,12 +3,16 @@ package com.safetynet.alerts.api.service;
 import com.safetynet.alerts.api.dao.IFireStationDao;
 import com.safetynet.alerts.api.dao.IMedicalRecordDao;
 import com.safetynet.alerts.api.dao.IPersonDao;
+import com.safetynet.alerts.api.model.MedicalRecord;
 import com.safetynet.alerts.api.model.Person;
+import com.safetynet.alerts.api.model.dto.ChildAlertDto;
+import com.safetynet.alerts.api.model.dto.FireDto;
 import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataIllegalValueException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.FireStation;
+import com.safetynet.alerts.api.model.dto.FloodDto;
 import com.safetynet.alerts.api.utils.Age;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -139,5 +144,68 @@ public class FireStationService implements IFireStationService {
         }else {
             throw new DataNotFoundException("Fire station number " + stationNumber);
         }
+    }
+
+    /**
+     * For each given fire station, get the list of homes that depends on it,
+     * Home is defined by a list of persons that leave at same address, their medical record.
+     *
+     * @param stations list of station numbers
+     * @retun an object {@link FloodDto}
+     */
+    @Override
+    public FloodDto getFloodHomes(List<Integer> stations) {
+        Date personBirthdate;
+        List<String> addresses;
+        List<Person> persons;
+        int age;
+
+        FloodDto floodDto = new FloodDto();
+        for(Integer stationNumber : stations){
+            FloodDto.FireStation fireStationDto = new FloodDto.FireStation();
+            fireStationDto.setStationNumber(stationNumber);
+
+            addresses = fireStationDao.getAddresses(stationNumber);
+            for(String address : addresses)
+            {
+                FloodDto.Home homeDto = new FloodDto.Home();
+                homeDto.setAddress(address);
+
+                persons = personDao.getPersonsByAddress(address);
+                for(Person p : persons){
+                    String firstName = p.getFirstName();
+                    String lastName = p.getLastName();
+                    FloodDto.Person personDto = new FloodDto.Person();
+                    personDto.setFirstName(firstName);
+                    personDto.setLastName(lastName);
+                    personDto.setPhoneNumber(p.getPhone());
+
+                    try{
+                        personBirthdate = medicalRecordDao.getPersonBirthdate(p.getFirstName(),p.getLastName());
+                        age = Age.computeAge(personBirthdate);
+                        personDto.setAge(age);
+                    } catch (DataNotFoundException | DataIllegalValueException e ) {
+                        log.error("Age of " + firstName + " " + lastName + " cannot be computed : " + e.getMessage());
+                        //in order to provide this person, even if its age cannot be computed, do not propagate the exceptions
+                        //and force the age of the person to 0
+                        personDto.setAge(0);
+                    }
+
+                    FloodDto.MedicalRecord medicalRecordDto = new FloodDto.MedicalRecord();
+                    Optional<MedicalRecord> medicalRecordResult = medicalRecordDao.getMedicalRecord(firstName,lastName);
+                    if(medicalRecordResult.isPresent()){
+                        MedicalRecord medicalRecord = medicalRecordResult.get();
+                        medicalRecordDto.getMedications().addAll(medicalRecord.getMedications());
+                        medicalRecordDto.getAllergies().addAll(medicalRecord.getAllergies());
+                    }
+
+                    personDto.setMedicalRecord(medicalRecordDto);
+                    homeDto.getPersons().add(personDto);
+                }
+                fireStationDto.getHomes().add(homeDto);
+            }
+            floodDto.getFireStations().add(fireStationDto);
+        }
+        return floodDto;
     }
 }

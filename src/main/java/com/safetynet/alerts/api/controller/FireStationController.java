@@ -1,9 +1,11 @@
 package com.safetynet.alerts.api.controller;
 
+import com.safetynet.alerts.api.model.dto.FireDto;
 import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.FireStation;
+import com.safetynet.alerts.api.model.dto.FloodDto;
 import com.safetynet.alerts.api.service.IFireStationService;
 import com.safetynet.alerts.api.utils.IRequestLogger;
 import lombok.RequiredArgsConstructor;
@@ -147,5 +149,23 @@ public class FireStationController {
             requestLogger.logResponseFailure(e.getHttpStatus() ,e.getMessage());
             throw e;
         }
+    }
+
+    /**
+     * For each given fire station, get the list of homes that depends on it,
+     * Home is defined by a list of persons that leave at same address, their medical record.
+     *
+     * @param stations list of station numbers
+     *
+     * @retun HTTP response with :
+     *              Body : an object {@link com.safetynet.alerts.api.model.dto.FloodDto}
+     *              Http status code : "200-Ok" .
+     */
+    @GetMapping("/flood/stations")
+    public ResponseEntity<FloodDto> getFiredPersons(@RequestParam List<Integer> stations) {
+        requestLogger.logRequest("GET /flood/stations?stations="+ stations.toString());
+        FloodDto floodDto = fireStationService.getFloodHomes(stations);
+        requestLogger.logResponseSuccess(HttpStatus.OK ,"");
+        return ResponseEntity.ok(floodDto);
     }
 }

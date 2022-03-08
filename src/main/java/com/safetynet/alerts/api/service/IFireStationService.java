@@ -4,6 +4,7 @@ import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
+import com.safetynet.alerts.api.model.dto.FloodDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,5 +53,13 @@ public interface IFireStationService {
      * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
      */
     List<String> getPhones(Integer stationNumber) throws DataNotFoundException;
+    /**
+     * For each given fire station, get the list of homes that depends on it,
+     * Home is defined by a list of persons that leave at same address, their medical record.
+     *
+     * @param stations list of station numbers
+     * @retun an object {@link com.safetynet.alerts.api.model.dto.FloodDto}
+     */
+    FloodDto getFloodHomes(List<Integer> stations);
 }
 
