@@ -5,6 +5,7 @@ import com.safetynet.alerts.api.model.dto.FireDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
+import com.safetynet.alerts.api.model.dto.PersonInfoDto;
 import com.safetynet.alerts.api.service.IPersonService;
 import com.safetynet.alerts.api.utils.IRequestLogger;
 import lombok.RequiredArgsConstructor;
@@ -144,5 +145,24 @@ public class PersonController {
         FireDto fireDto = personService.getFiredPersons(address.trim());
         requestLogger.logResponseSuccess(HttpStatus.OK ,"");
         return ResponseEntity.ok(fireDto);
+    }
+
+    /**
+     * Get person information
+     *
+     * @param firstName - The first name of the person to delete
+     * @param lastName - The last name of the person to delete
+     *
+     * @retun HTTP response with :
+     *              Body : an object {@link com.safetynet.alerts.api.model.dto.PersonInfoDto}
+     *              Http status code : "200-Ok" .
+     */
+    @GetMapping("/personInfo")
+    public ResponseEntity<PersonInfoDto> getPersonInfo(@RequestParam String firstName,
+                                                   @RequestParam String lastName ) throws DataNotFoundException {
+        requestLogger.logRequest("GET /personInfo?firstName="+firstName+"&lastName="+ lastName);
+        PersonInfoDto personInfoDto = personService.getPersonInfo(firstName, lastName);
+        requestLogger.logResponseSuccess(HttpStatus.OK ,"");
+        return ResponseEntity.ok(personInfoDto);
     }
 }

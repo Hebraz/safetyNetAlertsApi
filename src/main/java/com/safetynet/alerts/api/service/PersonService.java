@@ -10,6 +10,7 @@ import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataIllegalValueException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
+import com.safetynet.alerts.api.model.dto.PersonInfoDto;
 import com.safetynet.alerts.api.utils.Age;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -162,5 +163,55 @@ public class PersonService implements IPersonService {
         }
 
         return fireDto;
+    }
+
+    /**
+     * Get person information
+     *
+     * @param firstName - The first name of the person to delete
+     * @param lastName - The last name of the person to delete
+     * @retun an object {@link com.safetynet.alerts.api.model.dto.PersonInfoDto}
+     * @throws DataNotFoundException if the person does not exist in the datasource. (No person with
+     * same firstName and lastName has been found).
+     */
+    @Override
+    public PersonInfoDto getPersonInfo(String firstName, String lastName) throws DataNotFoundException {
+        PersonInfoDto personInfoDto = new PersonInfoDto();
+
+        Optional<Person> personResult = personDao.getPerson(firstName, lastName);
+        if(personResult.isPresent())
+        {
+            Person person = personResult.get();
+            personInfoDto.setFirstName(firstName);
+            personInfoDto.setLastName(lastName);
+            personInfoDto.setEmail(person.getEmail());
+            personInfoDto.setAddress(person.getAddress());
+            personInfoDto.setCity(person.getCity());
+            personInfoDto.setZip(person.getZip());
+
+            try{
+                Date personBirthdate = medicalRecordDao.getPersonBirthdate(firstName,lastName);
+                int age = Age.computeAge(personBirthdate);
+                personInfoDto.setAge(age);
+            } catch (DataNotFoundException | DataIllegalValueException e ) {
+                log.error("Age of " + firstName + " " + lastName + " cannot be computed : " + e.getMessage());
+                //in order to provide this person, even if its age cannot be computed, do not propagate the exceptions
+                //and force the age of the person to 0
+                personInfoDto.setAge(0);
+            }
+
+            PersonInfoDto.MedicalRecord medicalRecordDto = new PersonInfoDto.MedicalRecord();
+            Optional<MedicalRecord> medicalRecordResult = medicalRecordDao.getMedicalRecord(firstName,lastName);
+            if(medicalRecordResult.isPresent()){
+                MedicalRecord medicalRecord = medicalRecordResult.get();
+                medicalRecordDto.getMedications().addAll(medicalRecord.getMedications());
+                medicalRecordDto.getAllergies().addAll(medicalRecord.getAllergies());
+            }
+            personInfoDto.setMedicalRecord(medicalRecordDto);
+            return personInfoDto;
+        } else {
+            throw new DataNotFoundException("Person " + firstName + " " + lastName);
+        }
+
     }
 }
