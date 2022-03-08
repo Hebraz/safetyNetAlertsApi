@@ -112,7 +112,20 @@ public class PersonDao implements IPersonDao{
     public List<Person> getPersonsByAddress(String address){
         List<Person> persons = dataSource.getData().getPersons();
         return persons.stream()
-                .filter(p -> p.getAddress().equals(address))
+                .filter(p -> p.getAddress().equalsIgnoreCase(address))
+                .collect(Collectors.toList());
+    }
+    /**
+     * Get a list of persons that live in a given city.
+     *
+     * @param city the city name.
+     * @return list of Person object.
+     */
+    @Override
+    public List<Person> getPersonsByCity(String city){
+        List<Person> persons = dataSource.getData().getPersons();
+        return persons.stream()
+                .filter(p -> p.getCity().equalsIgnoreCase(city))
                 .collect(Collectors.toList());
     }
 }

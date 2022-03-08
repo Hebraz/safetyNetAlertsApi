@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
+import java.util.List;
 
 /**
  *  Person endpoint
@@ -44,7 +45,7 @@ public class PersonController {
                                                @PathVariable("lastName") final String lastName) throws DataNotFoundException {
         requestLogger.logRequest("DELETE /person/"+firstName+"/"+lastName);
         try{
-            personService.deletePerson(firstName, lastName);
+            personService.deletePerson(firstName.trim(), lastName.trim());
             requestLogger.logResponseSuccess(HttpStatus.NO_CONTENT, null);
             return ResponseEntity.noContent().build();
         } catch (DataNotFoundException e){
@@ -161,8 +162,25 @@ public class PersonController {
     public ResponseEntity<PersonInfoDto> getPersonInfo(@RequestParam String firstName,
                                                    @RequestParam String lastName ) throws DataNotFoundException {
         requestLogger.logRequest("GET /personInfo?firstName="+firstName+"&lastName="+ lastName);
-        PersonInfoDto personInfoDto = personService.getPersonInfo(firstName, lastName);
+        PersonInfoDto personInfoDto = personService.getPersonInfo(firstName.trim(), lastName.trim());
         requestLogger.logResponseSuccess(HttpStatus.OK ,"");
         return ResponseEntity.ok(personInfoDto);
+    }
+
+    /**
+     * Get email of people who live in a given city
+     *
+     * @param city - The city name
+     *
+     * @retun HTTP response with :
+     *              Body : a list of emails
+     *              Http status code : "200-Ok" .
+     */
+    @GetMapping("/communityEmail")
+    public ResponseEntity<List<String >> getPersonInfo(@RequestParam String city) throws DataNotFoundException {
+        requestLogger.logRequest("GET /communityEmail?city="+city);
+        List<String> emails = personService.getEmailsByCity(city.trim());
+        requestLogger.logResponseSuccess(HttpStatus.OK ,"");
+        return ResponseEntity.ok(emails);
     }
 }

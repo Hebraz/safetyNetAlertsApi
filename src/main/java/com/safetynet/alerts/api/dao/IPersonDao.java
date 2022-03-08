@@ -15,7 +15,7 @@ public interface IPersonDao {
      * @param lastName last name of the person to get.
      * @return the person if found.
      */
-    public Optional<Person> getPerson(final String firstName, final String lastName);
+    Optional<Person> getPerson(final String firstName, final String lastName);
     /**
      * Delete a person from a datasource.
      *
@@ -25,7 +25,7 @@ public interface IPersonDao {
      * given firstName and lastName has been found).
      *
      */
-    public void deletePerson(final String firstName, final String lastName) throws DataNotFoundException;
+    void deletePerson(final String firstName, final String lastName) throws DataNotFoundException;
     /**
      * Update an existing person into a datasource.
      *
@@ -35,7 +35,7 @@ public interface IPersonDao {
      * same firstName and lastName has been found).
      *
      */
-    public Person updatePerson(Person personToUpdate) throws DataNotFoundException;
+    Person updatePerson(Person personToUpdate) throws DataNotFoundException;
     /**
      * Add a new a person into a datasource.
      *
@@ -45,12 +45,19 @@ public interface IPersonDao {
      * same firstName and lastName has been found).
      *
      */
-    public Person createPerson(Person personToCreate) throws DataAlreadyExistsException;
+    Person createPerson(Person personToCreate) throws DataAlreadyExistsException;
     /**
-     * Get a list of persons that live to a given address.
+     * Get a list of persons that live at a given address.
      *
      * @param address the address.
      * @return list of Person object.
      */
     List<Person> getPersonsByAddress(String address);
+    /**
+     * Get a list of persons that live in a given city.
+     *
+     * @param city the city name.
+     * @return list of Person object.
+     */
+    List<Person> getPersonsByCity(String city);
 }

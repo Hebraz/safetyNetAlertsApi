@@ -68,4 +68,11 @@ public interface IPersonService {
      * same firstName and lastName has been found).
      */
     PersonInfoDto getPersonInfo(String firstName, String lastName) throws DataNotFoundException;
+    /**
+     * Get email of people who live in a given city
+     *
+     * @param city - The city name
+     * @retun a list of emails.
+     */
+    List<String> getEmailsByCity(String city);
 }

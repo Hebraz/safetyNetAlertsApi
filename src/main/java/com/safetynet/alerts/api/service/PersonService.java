@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link IPersonService} to get,
@@ -212,6 +213,16 @@ public class PersonService implements IPersonService {
         } else {
             throw new DataNotFoundException("Person " + firstName + " " + lastName);
         }
-
+    }
+    /**
+     * Get email of people who live in a given city
+     *
+     * @param city - The city name
+     * @retun a list of emails.
+     */
+    @Override
+    public List<String> getEmailsByCity(String city){
+        List<Person> persons = personDao.getPersonsByCity(city);
+        return persons.stream().map(p->p.getEmail()).collect(Collectors.toList());
     }
 }
