@@ -1,7 +1,9 @@
 package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
+import com.safetynet.alerts.api.model.MedicalRecord;
 import com.safetynet.alerts.api.model.dto.ChildAlertDto;
+import com.safetynet.alerts.api.model.dto.FireDto;
 import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.service.exception.DataIllegalValueException;
 import com.safetynet.alerts.api.service.exception.DataNotFoundException;
@@ -27,6 +29,7 @@ public class PersonService implements IPersonService {
 
     private final IAlertsDataSource dataSource;
     private final IMedicalRecordService medicalRecordService;
+    private final IFireStationService fireStationService;
     /**
      * Get a person from a datasource.
      *
@@ -118,7 +121,7 @@ public class PersonService implements IPersonService {
     }
 
     /**
-     * Get a list of persons that leave to a given address.
+     * Get a list of persons that live to a given address.
      *
      * @param address the address.
      *
@@ -133,7 +136,7 @@ public class PersonService implements IPersonService {
     }
 
     /**
-     * Get a list of children that leave to a given address.
+     * Get a list of children that live to a given address.
      *
      * @param address the address
      *
@@ -164,5 +167,59 @@ public class PersonService implements IPersonService {
             }
         }
         return children;
+    }
+
+    /**
+     * Get the list of persons that live at given address, their medical record and the associated fire station.
+     *
+     * @param address address where the fire is
+     * @return a {@link FireDto} object
+     */
+    @Override
+    public FireDto getFiredPersons(String address)  {
+        FireDto fireDto = new FireDto();
+        List<Person> persons = this.getPersonsByAddress(address);
+        for(Person p : persons){
+            String firstName = p.getFirstName();
+            String lastName = p.getLastName();
+            Long age;
+
+            FireDto.Person fireDtoPerson = new FireDto.Person();
+            fireDtoPerson.setFirstName(firstName);
+            fireDtoPerson.setLastName(lastName);
+            fireDtoPerson.setPhoneNumber(p.getPhone());
+
+            try{
+                age = medicalRecordService.getPersonAge(firstName, lastName);
+                fireDtoPerson.setAge(age);
+            } catch (DataNotFoundException | DataIllegalValueException e ) {
+                log.error("Age of " + firstName + " " + lastName + " cannot be computed : " + e.getMessage());
+                //in order to provide this person, even if its age cannot be computed, do not propagate the exceptions
+                //and force the age of the person to 0
+                fireDtoPerson.setAge(0);
+            }
+
+            FireDto.MedicalRecord fireDtoMedicalRecord = new FireDto.MedicalRecord();
+            Optional<MedicalRecord> medicalRecordResult = medicalRecordService.getMedicalRecord(firstName,lastName);
+            if(medicalRecordResult.isPresent()){
+                MedicalRecord medicalRecord = medicalRecordResult.get();
+                fireDtoMedicalRecord.getMedications().addAll(medicalRecord.getMedications());
+                fireDtoMedicalRecord.getAllergies().addAll(medicalRecord.getAllergies());
+            }
+
+            fireDtoPerson.setFiredPersonMedicalRecord(fireDtoMedicalRecord);
+            fireDto.getPersons().add(fireDtoPerson);
+        }
+
+        try {
+            fireDto.setStationNumber(fireStationService.getFireStationNumber(address));
+        } catch (DataNotFoundException e){
+            log.error("No fire station at address " + address + " : " + e.getMessage());
+            //in order to provide the list of persons, even if no fire station have been found,
+            // Do not propagate the exception and force fire station to 0
+            fireDto.setStationNumber(0);
+        }
+
+        return fireDto;
     }
 }

@@ -16,7 +16,6 @@ public interface IFireStationService {
      * Get a fire station mapping from a datasource.
      *
      * @param address address to which the fire station is mapped.
-     *
      * @return the fire station mapping if found.
      */
     public Optional<FireStation> getFireStation(final String address);
@@ -25,7 +24,6 @@ public interface IFireStationService {
      * Get the list of addresses covered by one fire station.
      *
      * @param stationNumber the number of the fire station
-     *
      * @return a list of addresses, may be empty
      *
      */
@@ -35,18 +33,14 @@ public interface IFireStationService {
      * Delete a fire station mapping.
      *
      * @param address address to which the fire station is mapped.
-     *
      * @throws DataNotFoundException if no fire station is mapped to the given address.
-     *
      */
     public void deleteFireStation(final String address) throws DataNotFoundException;
     /**
      * Update a fire station into a datasource.
      *
      * @param fireStationToUpdate fire station to update.
-     *
      * @return updated fire station.
-     *
      *  @throws DataNotFoundException if fire station to update does not exist : no fire station at the given address.
      */
     public FireStation updateFireStation(FireStation fireStationToUpdate) throws DataNotFoundException;
@@ -54,9 +48,7 @@ public interface IFireStationService {
      * Create a fire station into a datasource.
      *
      * @param fireStationToCreate fire station to create.
-     *
      * @return created fire station.
-     *
      *  @throws DataAlreadyExistsException if fire station to create already exists at the given address.
      */
     public FireStation createFireStation(FireStation fireStationToCreate) throws DataAlreadyExistsException;
@@ -64,9 +56,7 @@ public interface IFireStationService {
      * Get the list of persons that depends on that fire station.
      *
      * @param stationNumber the number of the fire station
-     *
      * @return a FireStationPersonsDto object
-     *
      * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
      */
     FireStationPersonsDto getPersons(Integer stationNumber) throws DataNotFoundException;
@@ -75,11 +65,17 @@ public interface IFireStationService {
      * Get the list of phone numbers of people that depends on the given fire station.
      *
      * @param stationNumber the number of the fire station
-     *
      * @return a list of phone numbers
-     *
      * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
      */
     List<String> getPhones(Integer stationNumber) throws DataNotFoundException;
+    /**
+     * Get a fire station number by address.
+     *
+     * @param address address to which the fire station is mapped.
+     * @return the fire station number
+     * @throws DataNotFoundException if no fire station at given address exists in datasource
+     */
+    int getFireStationNumber(String address) throws DataNotFoundException;
 }
 

@@ -198,4 +198,21 @@ public class FireStationService implements IFireStationService {
             throw new DataNotFoundException("Fire station number " + stationNumber);
         }
     }
+
+    /**
+     * Get a fire station number by address.
+     *
+     * @param address address to which the fire station is mapped.
+     * @return the fire station number
+     * @throws DataNotFoundException if no fire station at given address exists in datasource
+     */
+    @Override
+    public int getFireStationNumber(String address) throws DataNotFoundException {
+        Optional<FireStation> fireStationResult = this.getFireStation(address);
+        if(fireStationResult.isPresent()){
+            return fireStationResult.get().getStation();
+        } else {
+            throw new DataNotFoundException("Fire station at address " + address);
+        }
+    }
 }

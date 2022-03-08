@@ -1,6 +1,7 @@
 package com.safetynet.alerts.api.controller;
 
 import com.safetynet.alerts.api.model.dto.ChildAlertDto;
+import com.safetynet.alerts.api.model.dto.FireDto;
 import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
 import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.service.exception.DataNotFoundException;
@@ -113,7 +114,7 @@ public class PersonController {
      *
      * @param address the address
      *
-     * HTTP response with :
+     * @retun HTTP response with :
      *              Body : an object {@link com.safetynet.alerts.api.model.dto.ChildAlertDto}
      *              Http status code : "200-Ok" .
      */
@@ -128,5 +129,22 @@ public class PersonController {
             requestLogger.logResponseSuccess(HttpStatus.OK, "");
             return ResponseEntity.ok(childAlertDto);
         }
+    }
+
+    /**
+     * Get the list of persons that leave at given address, their medical record and the associated fire station.
+     *
+     * @param address address where the fire is
+     *
+     * @retun HTTP response with :
+     *              Body : an object {@link com.safetynet.alerts.api.model.dto.FireDto}
+     *              Http status code : "200-Ok" .
+     */
+    @GetMapping("/fire")
+    public ResponseEntity<FireDto> getFiredPersons(@RequestParam String address) throws DataNotFoundException {
+        requestLogger.logRequest("GET /fire?address="+ address);
+        FireDto fireDto = personService.getFiredPersons(address.trim());
+        requestLogger.logResponseSuccess(HttpStatus.OK ,"");
+        return ResponseEntity.ok(fireDto);
     }
 }
