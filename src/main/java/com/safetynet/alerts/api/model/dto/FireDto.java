@@ -23,7 +23,7 @@ public class FireDto {
         private String lastName;
         private String phoneNumber;
         private long age;
-        private MedicalRecord firedPersonMedicalRecord;
+        private MedicalRecord medicalRecord;
     }
 
     @Getter

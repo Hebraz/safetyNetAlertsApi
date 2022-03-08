@@ -1,19 +1,12 @@
 package com.safetynet.alerts.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
-import com.safetynet.alerts.api.model.Person;
-import com.safetynet.alerts.api.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.core.io.ClassPathResource;
-
-import java.io.File;
-import java.util.TimeZone;
 
 @SpringBootApplication
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

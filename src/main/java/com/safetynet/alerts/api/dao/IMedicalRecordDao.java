@@ -1,16 +1,21 @@
-package com.safetynet.alerts.api.service;
-
-import com.safetynet.alerts.api.model.MedicalRecord;
-
-import java.util.Optional;
+package com.safetynet.alerts.api.dao;
 
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.exception.DataIllegalValueException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
-/**
- * Get, delete or save a person's medical record from/to a datasource.
- */
-public interface IMedicalRecordService {
+import com.safetynet.alerts.api.model.MedicalRecord;
+
+import java.util.Date;
+import java.util.Optional;
+
+public interface IMedicalRecordDao {
+    /**
+     * Get a person's medical record from a datasource.
+     *
+     * @param firstName first name of the person.
+     * @param lastName last name of the person.
+     * @return the medical record if found.
+     */
+    public Optional<MedicalRecord> getMedicalRecord(final String firstName, final String lastName);
     /**
      * Delete a person's medical record from a datasource.
      *
@@ -38,4 +43,13 @@ public interface IMedicalRecordService {
      * @throws DataAlreadyExistsException if medical record already exists in datasource
      */
     public MedicalRecord createMedicalRecord(MedicalRecord medicalRecordToCreate) throws DataAlreadyExistsException;
+    /**
+     * Get the birthdate of a person.
+     *
+     * @param firstName first name of the person.
+     * @param lastName last name of the person.
+     * @return birthdate the person
+     * @throws DataNotFoundException if medical record of the person does not exist in the datasource,
+     */
+    public Date getPersonBirthdate(String firstName, String lastName) throws DataNotFoundException;
 }

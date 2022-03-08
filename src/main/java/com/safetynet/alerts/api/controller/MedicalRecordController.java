@@ -1,7 +1,7 @@
 package com.safetynet.alerts.api.controller;
 
-import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.service.exception.DataNotFoundException;
+import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.MedicalRecord;
 import com.safetynet.alerts.api.service.IMedicalRecordService;
 import com.safetynet.alerts.api.utils.IRequestLogger;

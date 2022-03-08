@@ -1,4 +1,4 @@
-package com.safetynet.alerts.api.service.exception;
+package com.safetynet.alerts.api.exception;
 
 import org.springframework.http.HttpStatus;
 

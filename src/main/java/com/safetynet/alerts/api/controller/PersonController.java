@@ -2,9 +2,8 @@ package com.safetynet.alerts.api.controller;
 
 import com.safetynet.alerts.api.model.dto.ChildAlertDto;
 import com.safetynet.alerts.api.model.dto.FireDto;
-import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
-import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.service.exception.DataNotFoundException;
+import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
 import com.safetynet.alerts.api.service.IPersonService;
 import com.safetynet.alerts.api.utils.IRequestLogger;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
-import java.util.List;
 
 /**
  *  Person endpoint

@@ -1,7 +1,5 @@
-package com.safetynet.alerts.api.service;
+package com.safetynet.alerts.api.dao;
 
-import com.safetynet.alerts.api.model.dto.ChildAlertDto;
-import com.safetynet.alerts.api.model.dto.FireDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
@@ -9,11 +7,16 @@ import com.safetynet.alerts.api.model.Person;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Get, delete or save a person from/to a datasource.
- */
-public interface IPersonService {
-     /**
+public interface IPersonDao {
+    /**
+     * Get a person from a datasource.
+     *
+     * @param firstName first name of the person to get.
+     * @param lastName last name of the person to get.
+     * @return the person if found.
+     */
+    public Optional<Person> getPerson(final String firstName, final String lastName);
+    /**
      * Delete a person from a datasource.
      *
      * @param firstName first name of the person to delete.
@@ -44,17 +47,10 @@ public interface IPersonService {
      */
     public Person createPerson(Person personToCreate) throws DataAlreadyExistsException;
     /**
-     * Get a list of children that live to a given address.
+     * Get a list of persons that live to a given address.
      *
-     * @param address the address
-     * @return a {@link com.safetynet.alerts.api.model.dto.ChildAlertDto} object
+     * @param address the address.
+     * @return list of Person object.
      */
-    public ChildAlertDto getChildren(String address);
-    /**
-     * Get the list of persons that live at given address, their medical record and the associated fire station.
-     *
-     * @param address address where the fire is
-     * @return a {@link com.safetynet.alerts.api.model.dto.FireDto} object
-     */
-    FireDto getFiredPersons(String address);
+    List<Person> getPersonsByAddress(String address);
 }

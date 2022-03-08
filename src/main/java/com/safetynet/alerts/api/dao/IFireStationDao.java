@@ -1,17 +1,30 @@
-package com.safetynet.alerts.api.service;
+package com.safetynet.alerts.api.dao;
 
 import com.safetynet.alerts.api.model.FireStation;
-import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Get, delete or save a fire station mapping from/to a datasource.
- */
-public interface IFireStationService {
+public interface IFireStationDao {
+    /**
+     * Get a fire station mapping from a datasource.
+     *
+     * @param address address to which the fire station is mapped.
+     * @return the fire station mapping if found.
+     */
+    public Optional<FireStation> getFireStation(final String address);
+
+    /**
+     * Get the list of addresses covered by one fire station.
+     *
+     * @param stationNumber the number of the fire station
+     * @return a list of addresses, may be empty
+     *
+     */
+    List<String> getAddresses(Integer stationNumber);
+
     /**
      * Delete a fire station mapping.
      *
@@ -36,21 +49,11 @@ public interface IFireStationService {
      */
     public FireStation createFireStation(FireStation fireStationToCreate) throws DataAlreadyExistsException;
     /**
-     * Get the list of persons that depends on that fire station.
+     * Get a fire station number by address.
      *
-     * @param stationNumber the number of the fire station
-     * @return a FireStationPersonsDto object
-     * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
+     * @param address address to which the fire station is mapped.
+     * @return the fire station number
+     * @throws DataNotFoundException if no fire station at given address exists in datasource
      */
-    FireStationPersonsDto getPersons(Integer stationNumber) throws DataNotFoundException;
-
-    /**
-     * Get the list of phone numbers of people that depends on the given fire station.
-     *
-     * @param stationNumber the number of the fire station
-     * @return a list of phone numbers
-     * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
-     */
-    List<String> getPhones(Integer stationNumber) throws DataNotFoundException;
+    int getFireStationNumber(String address) throws DataNotFoundException;
 }
-

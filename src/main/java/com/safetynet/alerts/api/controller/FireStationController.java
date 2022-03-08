@@ -1,8 +1,8 @@
 package com.safetynet.alerts.api.controller;
 
 import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
-import com.safetynet.alerts.api.service.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.service.exception.DataNotFoundException;
+import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
+import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.service.IFireStationService;
 import com.safetynet.alerts.api.utils.IRequestLogger;
