@@ -5,6 +5,7 @@ import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.dto.FloodDto;
+import jdk.jfr.FlightRecorder;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,8 +59,8 @@ public interface IFireStationService {
      * Home is defined by a list of persons that leave at same address, their medical record.
      *
      * @param stations list of station numbers
-     * @retun an object {@link com.safetynet.alerts.api.model.dto.FloodDto}
+     * @retun a list of objects {@link com.safetynet.alerts.api.model.dto.FloodDto}
      */
-    FloodDto getFloodHomes(List<Integer> stations);
+    List<FloodDto> getFloodHomes(List<Integer> stations);
 }
 

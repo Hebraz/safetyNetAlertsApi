@@ -4,7 +4,7 @@ import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.MedicalRecord;
 import com.safetynet.alerts.api.service.IMedicalRecordService;
-import com.safetynet.alerts.api.utils.IRequestLogger;
+import com.safetynet.alerts.api.controller.uitls.IRequestLogger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

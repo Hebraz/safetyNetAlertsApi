@@ -128,4 +128,20 @@ public class PersonDao implements IPersonDao{
                 .filter(p -> p.getCity().equalsIgnoreCase(city))
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Get all persons named 'firstName' 'lastName' from a datasource.
+     *
+     * @param firstName first name of the person to get.
+     * @param lastName  last name of the person to get.
+     * @return a list of person
+     */
+    @Override
+    public List<Person> getPersons(String firstName, String lastName) {
+        List<Person> persons = dataSource.getData().getPersons();
+        return  persons
+                .stream()
+                .filter(p -> p.getFirstName().equalsIgnoreCase(firstName) && p.getLastName().equalsIgnoreCase(lastName))
+                .collect(Collectors.toList());
+    }
 }

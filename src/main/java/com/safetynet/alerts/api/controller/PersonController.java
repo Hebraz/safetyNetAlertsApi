@@ -1,21 +1,25 @@
 package com.safetynet.alerts.api.controller;
 
+import com.safetynet.alerts.api.controller.uitls.DtoFilter;
 import com.safetynet.alerts.api.model.dto.ChildAlertDto;
 import com.safetynet.alerts.api.model.dto.FireDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
-import com.safetynet.alerts.api.model.dto.PersonInfoDto;
+import com.safetynet.alerts.api.model.dto.PersonDto;
 import com.safetynet.alerts.api.service.IPersonService;
-import com.safetynet.alerts.api.utils.IRequestLogger;
+import com.safetynet.alerts.api.controller.uitls.IRequestLogger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *  Person endpoint
@@ -119,15 +123,20 @@ public class PersonController {
      *              Http status code : "200-Ok" .
      */
     @GetMapping("/childAlert")
-    public ResponseEntity<ChildAlertDto> getChildrenAtAddress(@RequestParam String address) {
+    public ResponseEntity<MappingJacksonValue> getChildrenAtAddress(@RequestParam String address) {
         requestLogger.logRequest("GET /childAlert?address="+ address);
+
         ChildAlertDto childAlertDto = personService.getChildren(address.trim());
+
+        requestLogger.logResponseSuccess(HttpStatus.OK, "");
         if(childAlertDto.getChildren().isEmpty()){
-            requestLogger.logResponseSuccess(HttpStatus.OK, "");
+            /*No child lives at this address : return an empty string*/
             return  ResponseEntity.ok().build();
         } else {
-            requestLogger.logResponseSuccess(HttpStatus.OK, "");
-            return ResponseEntity.ok(childAlertDto);
+            Map<String, Set<String>> dtoFilterSpec = Map.of("ChildAlertDtoChildrenFilter", Set.of("firstName","lastName","age"),
+                                                        "ChildAlertDtoAdultFilter", Set.of("firstName","lastName"));
+            MappingJacksonValue childAlertDtoFiltered = DtoFilter.apply(childAlertDto, dtoFilterSpec);
+            return ResponseEntity.ok(childAlertDtoFiltered);
         }
     }
 
@@ -141,11 +150,16 @@ public class PersonController {
      *              Http status code : "200-Ok" .
      */
     @GetMapping("/fire")
-    public ResponseEntity<FireDto> getFiredPersons(@RequestParam String address) throws DataNotFoundException {
+    public ResponseEntity<MappingJacksonValue> getFiredPersons(@RequestParam String address) throws DataNotFoundException {
         requestLogger.logRequest("GET /fire?address="+ address);
         FireDto fireDto = personService.getFiredPersons(address.trim());
+
+        Map<String, Set<String>> dtoFilterSpec = Map.of("PersonDtoFilter", Set.of("firstName","lastName","phone","age", "medicalRecord"),
+                                                        "MedicalRecordDtoFilter", Set.of("medications","allergies"));
+        MappingJacksonValue fireDtoFiltered = DtoFilter.apply(fireDto, dtoFilterSpec);
+
         requestLogger.logResponseSuccess(HttpStatus.OK ,"");
-        return ResponseEntity.ok(fireDto);
+        return ResponseEntity.ok(fireDtoFiltered);
     }
 
     /**
@@ -155,16 +169,21 @@ public class PersonController {
      * @param lastName - The last name of the person to delete
      *
      * @retun HTTP response with :
-     *              Body : an object {@link com.safetynet.alerts.api.model.dto.PersonInfoDto}
+     *              Body : a list of {@link com.safetynet.alerts.api.model.dto.PersonDto}
      *              Http status code : "200-Ok" .
      */
     @GetMapping("/personInfo")
-    public ResponseEntity<PersonInfoDto> getPersonInfo(@RequestParam String firstName,
+    public ResponseEntity<MappingJacksonValue> getPersonInfo(@RequestParam String firstName,
                                                    @RequestParam String lastName ) throws DataNotFoundException {
         requestLogger.logRequest("GET /personInfo?firstName="+firstName+"&lastName="+ lastName);
-        PersonInfoDto personInfoDto = personService.getPersonInfo(firstName.trim(), lastName.trim());
+
+        List<PersonDto> personDtos = personService.getPersonInfo(firstName.trim(), lastName.trim());
+        Map<String, Set<String>> dtoFilterSpec = Map.of("PersonDtoFilter",  Set.of("firstName","lastName","address","city", "zip", "email", "age", "medicalRecord"),
+                                                        "MedicalRecordDtoFilter", Set.of("medications","allergies"));
+        MappingJacksonValue fireDtoFiltered = DtoFilter.apply(personDtos, dtoFilterSpec);
+
         requestLogger.logResponseSuccess(HttpStatus.OK ,"");
-        return ResponseEntity.ok(personInfoDto);
+        return ResponseEntity.ok(fireDtoFiltered);
     }
 
     /**

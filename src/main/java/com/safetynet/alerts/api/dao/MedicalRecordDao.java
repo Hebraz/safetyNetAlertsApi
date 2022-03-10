@@ -117,28 +117,4 @@ public class MedicalRecordDao implements IMedicalRecordDao{
         }
     }
 
-    /*
-      @Override
-    public long getPersonAge(String firstName, String lastName) throws DataNotFoundException, DataIllegalValueException {
-        long birthDateInMs;
-        long nowInMs;
-        long personAge;
-        final long nbMilisecondsByYears = 31556925216L;
-        Optional<MedicalRecord> medicalRecordResult = medicalRecordDao.getMedicalRecord(firstName, lastName);
-        if(medicalRecordResult.isPresent()){
-            MedicalRecord medicalRecord = medicalRecordResult.get();
-            birthDateInMs = medicalRecord.getBirthdate().getTime();
-            nowInMs = new Date().getTime();
-            if(nowInMs >= birthDateInMs) {
-                personAge = (nowInMs - birthDateInMs) / nbMilisecondsByYears;
-                return personAge;
-            } else {
-                throw new DataIllegalValueException("Birthdate of " + firstName + " " + lastName, medicalRecord.getBirthdate().toString());
-            }
-        } else {
-            throw new DataNotFoundException("Medical record of " + firstName + " " +lastName);
-        }
-    }
-     */
-
 }

@@ -1,4 +1,4 @@
-package com.safetynet.alerts.api.utils;
+package com.safetynet.alerts.api.controller.uitls;
 
 import org.springframework.http.HttpStatus;
 

@@ -13,7 +13,7 @@ public interface IPersonDao {
      *
      * @param firstName first name of the person to get.
      * @param lastName last name of the person to get.
-     * @return the person if found.
+     * @return the first person found.
      */
     Optional<Person> getPerson(final String firstName, final String lastName);
     /**
@@ -60,4 +60,12 @@ public interface IPersonDao {
      * @return list of Person object.
      */
     List<Person> getPersonsByCity(String city);
+    /**
+     * Get all persons named 'firstName' 'lastName' from a datasource.
+     *
+     * @param firstName first name of the person to get.
+     * @param lastName last name of the person to get.
+     * @return a list of person
+     */
+    List<Person> getPersons(String firstName, String lastName);
 }

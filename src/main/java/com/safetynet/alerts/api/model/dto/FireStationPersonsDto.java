@@ -11,19 +11,13 @@ import java.util.List;
 @Getter
 @Setter
 public class FireStationPersonsDto {
-    private List<FireStationPerson> persons;
+    private List<PersonDto> persons;
     private Integer numberOfAdults;
     private Integer numberOfChildren;
 
-    public FireStationPersonsDto() {
-        persons = new ArrayList<>();
-    }
-    @Getter
-    @Setter
-    public static class FireStationPerson{
-        private String firstName;
-        private String lastName;
-        private String address;
-        private String phone;
+    public FireStationPersonsDto(List<PersonDto> persons, Integer numberOfAdults, Integer numberOfChildren) {
+        this.persons = persons;
+        this.numberOfAdults = numberOfAdults;
+        this.numberOfChildren = numberOfChildren;
     }
 }

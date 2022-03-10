@@ -1,22 +1,25 @@
 package com.safetynet.alerts.api.controller;
 
-import com.safetynet.alerts.api.model.dto.FireDto;
+import com.safetynet.alerts.api.controller.uitls.DtoFilter;
 import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.model.dto.FloodDto;
 import com.safetynet.alerts.api.service.IFireStationService;
-import com.safetynet.alerts.api.utils.IRequestLogger;
+import com.safetynet.alerts.api.controller.uitls.IRequestLogger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *  Fire station endpoint
@@ -115,12 +118,14 @@ public class FireStationController {
      * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
      */
     @GetMapping("/firestation")
-    public ResponseEntity<FireStationPersonsDto> getFireStationPersons(@RequestParam Integer stationNumber) throws DataNotFoundException {
+    public ResponseEntity<MappingJacksonValue> getFireStationPersons(@RequestParam Integer stationNumber) throws DataNotFoundException {
         requestLogger.logRequest("GET /firestation?stationNumber="+ stationNumber);
         try{
-            FireStationPersonsDto fireStationPersons = fireStationService.getPersons(stationNumber);
+            FireStationPersonsDto fireStationPersonsDto = fireStationService.getPersons(stationNumber);
+            Map<String, Set<String>> dtoFilterSpec = Map.of("PersonDtoFilter", Set.of("firstName","lastName","address","city", "zip", "phone"));
+            MappingJacksonValue fireStationPersonsDtoFiltered = DtoFilter.apply(fireStationPersonsDto, dtoFilterSpec);
             requestLogger.logResponseSuccess(HttpStatus.OK ,"");
-            return ResponseEntity.ok(fireStationPersons);
+            return ResponseEntity.ok(fireStationPersonsDtoFiltered);
         } catch (DataNotFoundException e){
             requestLogger.logResponseFailure(e.getHttpStatus() ,e.getMessage());
             throw e;
@@ -158,14 +163,17 @@ public class FireStationController {
      * @param stations list of station numbers
      *
      * @retun HTTP response with :
-     *              Body : an object {@link com.safetynet.alerts.api.model.dto.FloodDto}
+     *              Body : a list of objects {@link com.safetynet.alerts.api.model.dto.FloodDto}
      *              Http status code : "200-Ok" .
      */
     @GetMapping("/flood/stations")
-    public ResponseEntity<FloodDto> getFiredPersons(@RequestParam List<Integer> stations) {
+    public ResponseEntity<MappingJacksonValue> getFiredPersons(@RequestParam List<Integer> stations) {
         requestLogger.logRequest("GET /flood/stations?stations="+ stations.toString());
-        FloodDto floodDto = fireStationService.getFloodHomes(stations);
+        List<FloodDto> floodDtos = fireStationService.getFloodHomes(stations);
+        Map<String, Set<String>> dtoFilterSpec = Map.of("PersonDtoFilter", Set.of("firstName","lastName","phone","age", "medicalRecord"),
+                                                        "MedicalRecordDtoFilter", Set.of("medications","allergies"));
+        MappingJacksonValue floodDtoFiltered = DtoFilter.apply(floodDtos, dtoFilterSpec);
         requestLogger.logResponseSuccess(HttpStatus.OK ,"");
-        return ResponseEntity.ok(floodDto);
+        return ResponseEntity.ok(floodDtoFiltered);
     }
 }

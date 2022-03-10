@@ -10,7 +10,7 @@ import java.util.Date;
 public class Age {
     private static final int CHILD_AGE_LIMIT = 18;
 
-    public static int computeAge(Date birthdate) throws DataIllegalValueException {
+    public static int computeFromBirthdate(Date birthdate) throws DataIllegalValueException {
         LocalDate birthDateLocalDate = birthdate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
@@ -22,8 +22,7 @@ public class Age {
         }
     }
 
-    public static boolean isAdult(Date birthdate) throws DataIllegalValueException {
-        int age = Age.computeAge(birthdate);
+    public static boolean isAdult(int age)  {
         if(age > CHILD_AGE_LIMIT){
             return true;
         } else {

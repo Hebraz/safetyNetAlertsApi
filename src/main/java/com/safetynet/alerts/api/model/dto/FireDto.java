@@ -1,5 +1,6 @@
 package com.safetynet.alerts.api.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,32 +11,14 @@ import java.util.List;
 @Setter
 public class FireDto {
     private int stationNumber;
-    private List<Person> persons;
+    private List<PersonDto> persons;
 
     public FireDto(){
         persons = new ArrayList<>();
     }
 
-    @Getter
-    @Setter
-    public static class Person{
-        private String firstName;
-        private String lastName;
-        private String phoneNumber;
-        private long age;
-        private MedicalRecord medicalRecord;
+    public FireDto(int stationNumber, List<PersonDto> persons) {
+        this.stationNumber = stationNumber;
+        this.persons = persons;
     }
-
-    @Getter
-    @Setter
-    public static class MedicalRecord{
-        private List<String> medications;
-        private List<String> allergies;
-
-        public MedicalRecord(){
-            medications = new ArrayList<>();
-            allergies = new ArrayList<>();
-        }
-    }
-
 }

@@ -5,10 +5,9 @@ import com.safetynet.alerts.api.model.dto.FireDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
-import com.safetynet.alerts.api.model.dto.PersonInfoDto;
+import com.safetynet.alerts.api.model.dto.PersonDto;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Get, delete or save a person from/to a datasource.
@@ -57,17 +56,15 @@ public interface IPersonService {
      * @param address address where the fire is
      * @return a {@link com.safetynet.alerts.api.model.dto.FireDto} object
      */
-    FireDto getFiredPersons(String address);
+    FireDto getFiredPersons(String address) throws DataNotFoundException;
     /**
      * Get person information
      *
      * @param firstName - The first name of the person to delete
      * @param lastName - The last name of the person to delete
-     * @retun an object {@link com.safetynet.alerts.api.model.dto.PersonInfoDto}
-     * @throws DataNotFoundException if the person does not exist in the datasource. (No person with
-     * same firstName and lastName has been found).
+     * @retun a list of {@link com.safetynet.alerts.api.model.dto.PersonDto}
      */
-    PersonInfoDto getPersonInfo(String firstName, String lastName) throws DataNotFoundException;
+    List<PersonDto> getPersonInfo(String firstName, String lastName);
     /**
      * Get email of people who live in a given city
      *

@@ -3,16 +3,14 @@ package com.safetynet.alerts.api.service;
 import com.safetynet.alerts.api.dao.IFireStationDao;
 import com.safetynet.alerts.api.dao.IMedicalRecordDao;
 import com.safetynet.alerts.api.dao.IPersonDao;
-import com.safetynet.alerts.api.model.MedicalRecord;
 import com.safetynet.alerts.api.model.Person;
-import com.safetynet.alerts.api.model.dto.ChildAlertDto;
-import com.safetynet.alerts.api.model.dto.FireDto;
 import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.exception.DataIllegalValueException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.model.dto.FloodDto;
+import com.safetynet.alerts.api.model.dto.PersonDto;
+import com.safetynet.alerts.api.service.dtomapper.IDtoMapper;
 import com.safetynet.alerts.api.utils.Age;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,9 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +35,7 @@ public class FireStationService implements IFireStationService {
     private final IFireStationDao fireStationDao;
     private final IPersonDao personDao;
     private final IMedicalRecordDao medicalRecordDao;
-
+    private final IDtoMapper<Person,PersonDto> personDtoMapper;
     /**
      * Delete a fire station mapping.
      *
@@ -80,45 +78,28 @@ public class FireStationService implements IFireStationService {
      * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
      */
     public FireStationPersonsDto getPersons(Integer stationNumber) throws DataNotFoundException {
-        Date personBirthdate;
+        int numberOfAdults = 0;
+        int numberOfChildren = 0;
+        final List<PersonDto> personDtos= new ArrayList<>();
+
         final List<String> fireStationAddresses = fireStationDao.getAddresses(stationNumber);
         if(! fireStationAddresses.isEmpty()){
-
-            FireStationPersonsDto fireStationPersonsDto = new FireStationPersonsDto();
-            int numberOfAdults = 0;
-            int numberOfChildren = 0;
-
+            /*For each address covered by the fire station, get all persons (Dto) that lives at that address
+            and add them to the personDtos list*/
             for(String fireStationAddress : fireStationAddresses){
-                List<Person> persons = personDao.getPersonsByAddress(fireStationAddress);
-                if(! persons.isEmpty()){
-                    List<FireStationPersonsDto.FireStationPerson> fireStationPersons =
-                        persons.stream().map(p -> {
-                            FireStationPersonsDto.FireStationPerson fireStationPerson = new FireStationPersonsDto.FireStationPerson();
-                            fireStationPerson.setFirstName(p.getFirstName());
-                            fireStationPerson.setLastName(p.getLastName());
-                            fireStationPerson.setAddress(p.getAddress());
-                            fireStationPerson.setPhone(p.getPhone());
-                            return fireStationPerson;
-                        }).collect(Collectors.toList());
-
-                    for(Person p : persons){
-                        try{
-                            personBirthdate = medicalRecordDao.getPersonBirthdate(p.getFirstName(),p.getLastName());
-                            if(Age.isAdult(personBirthdate)) {
-                                numberOfAdults++;
-                            } else {
-                                numberOfChildren++;
-                            }
-                        } catch (DataIllegalValueException | DataNotFoundException e) {
-                            log.error("Failed to get the age of " + p.getFirstName() + " " + p.getLastName() + ": " + e.getMessage());
-                        }
-                    }
-                    fireStationPersonsDto.getPersons().addAll(fireStationPersons);
-                }
+                personDtos.addAll(
+                        personDao.getPersonsByAddress(fireStationAddress)
+                                .stream()
+                                .map(p -> personDtoMapper.mapToDto(p))
+                                .collect(Collectors.toList()));
             }
-            fireStationPersonsDto.setNumberOfAdults(numberOfAdults);
-            fireStationPersonsDto.setNumberOfChildren(numberOfChildren);
-            return fireStationPersonsDto;
+            numberOfAdults = (int)personDtos.stream()
+                    .filter(p -> Objects.nonNull(p.getAge()) && Age.isAdult(p.getAge()))
+                    .count();
+            numberOfChildren = (int)personDtos.stream()
+                    .filter(p -> Objects.nonNull(p.getAge()) && !Age.isAdult(p.getAge()))
+                    .count();
+            return new FireStationPersonsDto(personDtos, numberOfAdults,numberOfChildren);
         } else {
             throw new DataNotFoundException("Fire station number " + stationNumber);
         }
@@ -137,10 +118,15 @@ public class FireStationService implements IFireStationService {
         final List<String> fireStationAddresses = fireStationDao.getAddresses(stationNumber);
         if (!fireStationAddresses.isEmpty()) {
             for (String fireStationAddress : fireStationAddresses) {
-                List<Person> persons = personDao.getPersonsByAddress(fireStationAddress);
-                persons.stream().forEach(p -> phones.add(p.getPhone()));
+                //Get all personDtos that lives at current address and add their phone to the phones list
+                phones.addAll(
+                        personDao.getPersonsByAddress(fireStationAddress)
+                                .stream()
+                                .map(p -> p.getPhone())
+                                .distinct()
+                                .collect(Collectors.toList()));
             }
-            return phones;
+            return phones.stream().distinct().collect(Collectors.toList());
         }else {
             throw new DataNotFoundException("Fire station number " + stationNumber);
         }
@@ -151,61 +137,24 @@ public class FireStationService implements IFireStationService {
      * Home is defined by a list of persons that leave at same address, their medical record.
      *
      * @param stations list of station numbers
-     * @retun an object {@link FloodDto}
+     * @retun List of object {@link FloodDto}
      */
     @Override
-    public FloodDto getFloodHomes(List<Integer> stations) {
-        Date personBirthdate;
-        List<String> addresses;
-        List<Person> persons;
-        int age;
+    public  List<FloodDto> getFloodHomes(List<Integer> stations) {
+        List<PersonDto> personDtos;
+        List<FloodDto> floodDtos = new ArrayList<>();
 
-        FloodDto floodDto = new FloodDto();
         for(Integer stationNumber : stations){
-            FloodDto.FireStation fireStationDto = new FloodDto.FireStation();
-            fireStationDto.setStationNumber(stationNumber);
-
-            addresses = fireStationDao.getAddresses(stationNumber);
-            for(String address : addresses)
+            for(String address : fireStationDao.getAddresses(stationNumber))
             {
-                FloodDto.Home homeDto = new FloodDto.Home();
-                homeDto.setAddress(address);
+                personDtos = personDao.getPersonsByAddress(address)
+                        .stream()
+                        .map(p -> personDtoMapper.mapToDto(p))
+                        .collect(Collectors.toList());
 
-                persons = personDao.getPersonsByAddress(address);
-                for(Person p : persons){
-                    String firstName = p.getFirstName();
-                    String lastName = p.getLastName();
-                    FloodDto.Person personDto = new FloodDto.Person();
-                    personDto.setFirstName(firstName);
-                    personDto.setLastName(lastName);
-                    personDto.setPhoneNumber(p.getPhone());
-
-                    try{
-                        personBirthdate = medicalRecordDao.getPersonBirthdate(p.getFirstName(),p.getLastName());
-                        age = Age.computeAge(personBirthdate);
-                        personDto.setAge(age);
-                    } catch (DataNotFoundException | DataIllegalValueException e ) {
-                        log.error("Age of " + firstName + " " + lastName + " cannot be computed : " + e.getMessage());
-                        //in order to provide this person, even if its age cannot be computed, do not propagate the exceptions
-                        //and force the age of the person to 0
-                        personDto.setAge(0);
-                    }
-
-                    FloodDto.MedicalRecord medicalRecordDto = new FloodDto.MedicalRecord();
-                    Optional<MedicalRecord> medicalRecordResult = medicalRecordDao.getMedicalRecord(firstName,lastName);
-                    if(medicalRecordResult.isPresent()){
-                        MedicalRecord medicalRecord = medicalRecordResult.get();
-                        medicalRecordDto.getMedications().addAll(medicalRecord.getMedications());
-                        medicalRecordDto.getAllergies().addAll(medicalRecord.getAllergies());
-                    }
-
-                    personDto.setMedicalRecord(medicalRecordDto);
-                    homeDto.getPersons().add(personDto);
-                }
-                fireStationDto.getHomes().add(homeDto);
+                floodDtos.add(new FloodDto(address,personDtos));
             }
-            floodDto.getFireStations().add(fireStationDto);
         }
-        return floodDto;
+        return floodDtos;
     }
 }
