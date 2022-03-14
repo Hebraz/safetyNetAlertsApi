@@ -2,13 +2,11 @@ package com.safetynet.alerts.api.dao;
 
 import com.safetynet.alerts.api.datasource.IAlertsDataSource;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.exception.DataIllegalValueException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.MedicalRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;

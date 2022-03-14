@@ -2,10 +2,7 @@ package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.model.MedicalRecord;
 
-import java.util.Optional;
-
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.exception.DataIllegalValueException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 /**
  * Get, delete or save a person's medical record from/to a datasource.

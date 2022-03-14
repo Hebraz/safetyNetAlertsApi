@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.model.MedicalRecord;
 import com.safetynet.alerts.api.model.Person;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;

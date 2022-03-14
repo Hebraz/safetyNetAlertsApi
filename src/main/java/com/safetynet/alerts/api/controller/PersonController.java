@@ -119,7 +119,7 @@ public class PersonController {
      * @param address the address
      *
      * @retun HTTP response with :
-     *              Body : an object {@link com.safetynet.alerts.api.model.dto.ChildAlertDto}
+     *              Body : an object {@link ChildAlertDto}
      *              Http status code : "200-Ok" .
      */
     @GetMapping("/childAlert")
@@ -146,7 +146,7 @@ public class PersonController {
      * @param address address where the fire is
      *
      * @retun HTTP response with :
-     *              Body : an object {@link com.safetynet.alerts.api.model.dto.FireDto}
+     *              Body : an object {@link FireDto}
      *              Http status code : "200-Ok" .
      */
     @GetMapping("/fire")
@@ -169,12 +169,12 @@ public class PersonController {
      * @param lastName - The last name of the person to delete
      *
      * @retun HTTP response with :
-     *              Body : a list of {@link com.safetynet.alerts.api.model.dto.PersonDto}
+     *              Body : a list of {@link PersonDto}
      *              Http status code : "200-Ok" .
      */
     @GetMapping("/personInfo")
-    public ResponseEntity<MappingJacksonValue> getPersonInfo(@RequestParam String firstName,
-                                                   @RequestParam String lastName ) throws DataNotFoundException {
+    public ResponseEntity<MappingJacksonValue> getCommunityEmail(@RequestParam String firstName,
+                                                                 @RequestParam String lastName ) throws DataNotFoundException {
         requestLogger.logRequest("GET /personInfo?firstName="+firstName+"&lastName="+ lastName);
 
         List<PersonDto> personDtos = personService.getPersonInfo(firstName.trim(), lastName.trim());
@@ -196,7 +196,7 @@ public class PersonController {
      *              Http status code : "200-Ok" .
      */
     @GetMapping("/communityEmail")
-    public ResponseEntity<List<String >> getPersonInfo(@RequestParam String city) throws DataNotFoundException {
+    public ResponseEntity<List<String >> getCommunityEmail(@RequestParam String city) throws DataNotFoundException {
         requestLogger.logRequest("GET /communityEmail?city="+city);
         List<String> emails = personService.getEmailsByCity(city.trim());
         requestLogger.logResponseSuccess(HttpStatus.OK ,"");

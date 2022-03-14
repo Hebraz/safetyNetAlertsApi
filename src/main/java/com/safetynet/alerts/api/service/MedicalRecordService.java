@@ -2,14 +2,12 @@ package com.safetynet.alerts.api.service;
 
 import com.safetynet.alerts.api.dao.IMedicalRecordDao;
 import com.safetynet.alerts.api.exception.DataAlreadyExistsException;
-import com.safetynet.alerts.api.exception.DataIllegalValueException;
 import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.MedicalRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Date;
-import java.util.Optional;
+
 /**
  * Implementation of {@link IMedicalRecordService} to get,
  * delete or save a person's medical record from/to a datasource.

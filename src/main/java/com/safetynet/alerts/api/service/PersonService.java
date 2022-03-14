@@ -9,7 +9,7 @@ import com.safetynet.alerts.api.exception.DataNotFoundException;
 import com.safetynet.alerts.api.model.Person;
 import com.safetynet.alerts.api.model.dto.PersonDto;
 import com.safetynet.alerts.api.service.dtomapper.IDtoMapper;
-import com.safetynet.alerts.api.utils.Age;
+import com.safetynet.alerts.api.utils.IAgeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +30,7 @@ public class PersonService implements IPersonService {
     private final IPersonDao personDao;
     private final IFireStationDao fireStationDao;
     private final IDtoMapper<Person,PersonDto> personDtoMapper;
+    private final IAgeUtil ageUtil;
     /**
      * Delete a person from a datasource.
      *
@@ -75,26 +76,22 @@ public class PersonService implements IPersonService {
      * Get a list of children that live to a given address.
      *
      * @param address the address
-     * @return a {@link com.safetynet.alerts.api.model.dto.ChildAlertDto} object
+     * @return a {@link ChildAlertDto} object
      *
      */
     public ChildAlertDto getChildren(String address){
-        List<PersonDto> adults = new ArrayList<>();
-        List<PersonDto> children = new ArrayList<>();
 
         List<Person> persons = personDao.getPersonsByAddress(address);
 
-        adults.addAll(
-                persons.stream()
-                        .map(p -> personDtoMapper.mapToDto(p))
-                        .filter(p -> Objects.nonNull(p.getAge()) && Age.isAdult(p.getAge()))
-                        .collect(Collectors.toList()));
+        List<PersonDto> adults = persons.stream()
+                .map(personDtoMapper::mapToDto)
+                .filter(p -> Objects.nonNull(p.getAge()) && ageUtil.isAdult(p.getAge()))
+                .collect(Collectors.toList());
 
-        children.addAll(
-                persons.stream()
-                        .map(p -> personDtoMapper.mapToDto(p))
-                        .filter(p -> Objects.nonNull(p.getAge()) && !Age.isAdult(p.getAge()))
-                        .collect(Collectors.toList()));
+        List<PersonDto> children = persons.stream()
+                .map(personDtoMapper::mapToDto)
+                .filter(p -> Objects.nonNull(p.getAge()) && !ageUtil.isAdult(p.getAge()))
+                .collect(Collectors.toList());
 
         return new ChildAlertDto(children,adults);
     }
@@ -112,7 +109,7 @@ public class PersonService implements IPersonService {
 
         personDtos = personDao.getPersonsByAddress(address)
                 .stream()
-                .map(p -> personDtoMapper.mapToDto(p))
+                .map(personDtoMapper::mapToDto)
                 .collect(Collectors.toList());
 
         try {
@@ -120,7 +117,7 @@ public class PersonService implements IPersonService {
         } catch (DataNotFoundException e){
             log.error("No fire station at address " + address + " : " + e.getMessage());
             //if no person live at this address, throw an exception
-            throw new DataNotFoundException("Persons that live at address " + address);
+            if(personDtos.isEmpty()) throw new DataNotFoundException("Persons that live at address " + address);
         }
         return new FireDto(stationNumber,personDtos);
     }
@@ -130,13 +127,13 @@ public class PersonService implements IPersonService {
      *
      * @param firstName - The first name of the person to delete
      * @param lastName - The last name of the person to delete
-     * @retun a list of {@link com.safetynet.alerts.api.model.dto.PersonDto}
+     * @retun a list of {@link PersonDto}
      */
     @Override
     public List<PersonDto> getPersonInfo(String firstName, String lastName) {
         return personDao.getPersons(firstName, lastName)
                 .stream()
-                .map(p -> personDtoMapper.mapToDto(p))
+                .map(personDtoMapper::mapToDto)
                 .collect(Collectors.toList());
     }
     /**
@@ -149,7 +146,7 @@ public class PersonService implements IPersonService {
     public List<String> getEmailsByCity(String city){
         return personDao.getPersonsByCity(city)
                 .stream()
-                .map(p->p.getEmail())
+                .map(Person::getEmail)
                 .distinct()
                 .collect(Collectors.toList());
     }

@@ -1,9 +1,5 @@
 package com.safetynet.alerts.api.model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * Person entity
  */
@@ -26,6 +22,16 @@ public class Person {
         this.zip = person.zip;
         this.phone = person.phone;
         this.email = person.email;
+    }
+
+    public Person(String firstName, String lastName, String address, String city, String zip, String phone, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.city = city;
+        this.zip = zip;
+        this.phone = phone;
+        this.email = email;
     }
 
     public String getFirstName() {

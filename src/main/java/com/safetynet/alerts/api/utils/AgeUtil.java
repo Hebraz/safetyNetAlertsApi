@@ -1,16 +1,17 @@
 package com.safetynet.alerts.api.utils;
 
 import com.safetynet.alerts.api.exception.DataIllegalValueException;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.Date;
-
-public class Age {
+@Component
+public class AgeUtil implements IAgeUtil {
     private static final int CHILD_AGE_LIMIT = 18;
 
-    public static int computeFromBirthdate(Date birthdate) throws DataIllegalValueException {
+    public int computeFromBirthdate(Date birthdate) throws DataIllegalValueException {
         LocalDate birthDateLocalDate = birthdate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
@@ -22,7 +23,7 @@ public class Age {
         }
     }
 
-    public static boolean isAdult(int age)  {
+    public boolean isAdult(int age)  {
         if(age > CHILD_AGE_LIMIT){
             return true;
         } else {

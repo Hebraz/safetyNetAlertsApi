@@ -19,6 +19,11 @@ public class FireStation {
         this.address = fireStation.address;
     }
 
+    public FireStation(String address, int station) {
+        this.address = address;
+        this.station = station;
+    }
+
     public String getAddress() { return address; }
 
     public void setAddress(String address) {

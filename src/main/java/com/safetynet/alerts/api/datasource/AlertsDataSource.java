@@ -1,17 +1,11 @@
 package com.safetynet.alerts.api.datasource;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.alerts.api.model.FireStation;
-import com.safetynet.alerts.api.model.MedicalRecord;
-import com.safetynet.alerts.api.model.Person;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 
 /**

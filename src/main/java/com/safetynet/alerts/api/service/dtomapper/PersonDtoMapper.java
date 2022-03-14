@@ -6,7 +6,7 @@ import com.safetynet.alerts.api.model.MedicalRecord;
 import com.safetynet.alerts.api.model.Person;
 import com.safetynet.alerts.api.model.dto.MedicalRecordDto;
 import com.safetynet.alerts.api.model.dto.PersonDto;
-import com.safetynet.alerts.api.utils.Age;
+import com.safetynet.alerts.api.utils.IAgeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class PersonDtoMapper implements IDtoMapper<Person, PersonDto> {
 
     private final IMedicalRecordDao medicalRecordDao;
     private final IDtoMapper<MedicalRecord, MedicalRecordDto> medicalRecordDtoIDtoMapper;
-
+    private final IAgeUtil ageUtil;
     @Override
     public PersonDto mapToDto(Person p) {
         Date birthdate;
@@ -37,7 +37,7 @@ public class PersonDtoMapper implements IDtoMapper<Person, PersonDto> {
 
             /*Compute age of the person according to its birthdate from the medical record*/
             try{
-                age = Age.computeFromBirthdate(medicalRecordDto.getBirthdate());
+                age = ageUtil.computeFromBirthdate(medicalRecordDto.getBirthdate());
             } catch (DataIllegalValueException e) {
                 log.error("Failed to get the age of " + p.getFirstName() + " " + p.getLastName() + ": " + e.getMessage());
             }

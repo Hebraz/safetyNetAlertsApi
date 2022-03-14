@@ -47,14 +47,14 @@ public interface IPersonService {
      * Get a list of children that live to a given address.
      *
      * @param address the address
-     * @return a {@link com.safetynet.alerts.api.model.dto.ChildAlertDto} object
+     * @return a {@link ChildAlertDto} object
      */
     public ChildAlertDto getChildren(String address);
     /**
      * Get the list of persons that live at given address, their medical record and the associated fire station.
      *
      * @param address address where the fire is
-     * @return a {@link com.safetynet.alerts.api.model.dto.FireDto} object
+     * @return a {@link FireDto} object
      */
     FireDto getFiredPersons(String address) throws DataNotFoundException;
     /**
@@ -62,7 +62,7 @@ public interface IPersonService {
      *
      * @param firstName - The first name of the person to delete
      * @param lastName - The last name of the person to delete
-     * @retun a list of {@link com.safetynet.alerts.api.model.dto.PersonDto}
+     * @retun a list of {@link PersonDto}
      */
     List<PersonDto> getPersonInfo(String firstName, String lastName);
     /**

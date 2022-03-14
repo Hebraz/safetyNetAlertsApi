@@ -25,10 +25,11 @@ import java.util.Set;
  *  Fire station endpoint
  */
 @RestController
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor(onConstructor= @__(@Autowired))
 public class FireStationController {
     private final IFireStationService fireStationService;
     private final IRequestLogger requestLogger;
+
 
     /**
      * Delete a fire station  mapping.
@@ -112,7 +113,7 @@ public class FireStationController {
      * @param stationNumber the number of the fire station
      *
      * HTTP response with :
-     *              Body : an object {@link com.safetynet.alerts.api.model.dto.FireStationPersonsDto}
+     *              Body : an object {@link FireStationPersonsDto}
      *              Http status code : "200-Ok" .
      *
      * @throws DataNotFoundException if no fire station with number 'stationNumber' exists in datasource
@@ -163,11 +164,11 @@ public class FireStationController {
      * @param stations list of station numbers
      *
      * @retun HTTP response with :
-     *              Body : a list of objects {@link com.safetynet.alerts.api.model.dto.FloodDto}
+     *              Body : a list of objects {@link FloodDto}
      *              Http status code : "200-Ok" .
      */
     @GetMapping("/flood/stations")
-    public ResponseEntity<MappingJacksonValue> getFiredPersons(@RequestParam List<Integer> stations) {
+    public ResponseEntity<MappingJacksonValue> getFloodStations(@RequestParam List<Integer> stations) {
         requestLogger.logRequest("GET /flood/stations?stations="+ stations.toString());
         List<FloodDto> floodDtos = fireStationService.getFloodHomes(stations);
         Map<String, Set<String>> dtoFilterSpec = Map.of("PersonDtoFilter", Set.of("firstName","lastName","phone","age", "medicalRecord"),

@@ -1,7 +1,7 @@
 package com.safetynet.alerts.api.service;
 
+import com.safetynet.alerts.api.dao.FireStationDao;
 import com.safetynet.alerts.api.dao.IFireStationDao;
-import com.safetynet.alerts.api.dao.IMedicalRecordDao;
 import com.safetynet.alerts.api.dao.IPersonDao;
 import com.safetynet.alerts.api.model.Person;
 import com.safetynet.alerts.api.model.dto.FireStationPersonsDto;
@@ -11,7 +11,7 @@ import com.safetynet.alerts.api.model.FireStation;
 import com.safetynet.alerts.api.model.dto.FloodDto;
 import com.safetynet.alerts.api.model.dto.PersonDto;
 import com.safetynet.alerts.api.service.dtomapper.IDtoMapper;
-import com.safetynet.alerts.api.utils.Age;
+import com.safetynet.alerts.api.utils.IAgeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -34,8 +33,8 @@ public class FireStationService implements IFireStationService {
 
     private final IFireStationDao fireStationDao;
     private final IPersonDao personDao;
-    private final IMedicalRecordDao medicalRecordDao;
     private final IDtoMapper<Person,PersonDto> personDtoMapper;
+    private final IAgeUtil ageUtil;
     /**
      * Delete a fire station mapping.
      *
@@ -90,14 +89,14 @@ public class FireStationService implements IFireStationService {
                 personDtos.addAll(
                         personDao.getPersonsByAddress(fireStationAddress)
                                 .stream()
-                                .map(p -> personDtoMapper.mapToDto(p))
+                                .map(personDtoMapper::mapToDto)
                                 .collect(Collectors.toList()));
             }
             numberOfAdults = (int)personDtos.stream()
-                    .filter(p -> Objects.nonNull(p.getAge()) && Age.isAdult(p.getAge()))
+                    .filter(p -> Objects.nonNull(p.getAge()) && ageUtil.isAdult(p.getAge()))
                     .count();
             numberOfChildren = (int)personDtos.stream()
-                    .filter(p -> Objects.nonNull(p.getAge()) && !Age.isAdult(p.getAge()))
+                    .filter(p -> Objects.nonNull(p.getAge()) && !ageUtil.isAdult(p.getAge()))
                     .count();
             return new FireStationPersonsDto(personDtos, numberOfAdults,numberOfChildren);
         } else {
@@ -122,7 +121,7 @@ public class FireStationService implements IFireStationService {
                 phones.addAll(
                         personDao.getPersonsByAddress(fireStationAddress)
                                 .stream()
-                                .map(p -> p.getPhone())
+                                .map(Person::getPhone)
                                 .distinct()
                                 .collect(Collectors.toList()));
             }
@@ -144,17 +143,24 @@ public class FireStationService implements IFireStationService {
         List<PersonDto> personDtos;
         List<FloodDto> floodDtos = new ArrayList<>();
 
-        for(Integer stationNumber : stations){
-            for(String address : fireStationDao.getAddresses(stationNumber))
-            {
-                personDtos = personDao.getPersonsByAddress(address)
-                        .stream()
-                        .map(p -> personDtoMapper.mapToDto(p))
-                        .collect(Collectors.toList());
+        /*get addresses covered by the list of stations. Some stations
+        cover same address, so distinct is applied to get o list of unique addresses*/
+        List<String> addresses = stations.stream()
+                .map(fireStationDao::getAddresses)
+                .flatMap(List::stream)
+                .distinct()
+                .collect(Collectors.toList());
 
-                floodDtos.add(new FloodDto(address,personDtos));
-            }
+        for(String address : addresses)
+        {
+            personDtos = personDao.getPersonsByAddress(address)
+                    .stream()
+                    .map(personDtoMapper::mapToDto)
+                    .collect(Collectors.toList());
+
+            floodDtos.add(new FloodDto(address,personDtos));
         }
+
         return floodDtos;
     }
 }

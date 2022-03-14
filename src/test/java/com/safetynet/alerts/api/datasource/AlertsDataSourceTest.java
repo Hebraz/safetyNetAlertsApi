@@ -12,14 +12,16 @@ import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 class AlertsDataSourceTest {
 
-    @Autowired
     private AlertsDataSource alertsDataSource;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.FRENCH);
 
+    @BeforeEach
+    void initTest(){
+        alertsDataSource = new AlertsDataSource();
+    }
 
     @Test
     void loadNullParameter() throws IOException {
